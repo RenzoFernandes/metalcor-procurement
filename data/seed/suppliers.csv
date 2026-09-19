@@ -1,0 +1,13 @@
+code,name,city,state,category_code,price_tier,payment_terms_days,lead_time_days,on_time_rate
+SUP-001,Aciaria Serra Azul S.A.,Betim,MG,ACO,premium,45,20,0.95
+SUP-002,Laminados Costa Norte Ltda,Serra,ES,ACO,economy,30,12,0.85
+SUP-003,Rolamentos Paulistano Ltda,Sorocaba,SP,ROL,premium,30,7,0.96
+SUP-004,Mecânica Rolamar S.A.,Caxias do Sul,RS,ROL,economy,30,14,0.84
+SUP-005,Usinagem Prime Ferramentas Ltda,Jundiaí,SP,FER,premium,30,5,0.96
+SUP-006,Carbotec Ferramentas Industriais Ltda,Joinville,SC,FER,economy,45,10,0.86
+SUP-007,Revestimentos Norteflex Ltda,Sumaré,SP,TIN,premium,30,7,0.95
+SUP-008,Química Planalto Industrial S.A.,Camaçari,BA,TIN,economy,45,12,0.85
+SUP-009,Embalagens Curitibana Ltda,Curitiba,PR,EMB,premium,30,5,0.95
+SUP-010,Cartonagem Bandeirantes S.A.,Guarulhos,SP,EMB,economy,30,7,0.87
+SUP-011,Motores e Automação Vale Verde Ltda,Blumenau,SC,MAN,premium,30,7,0.95
+SUP-012,Suprimentos Industriais Alfa Ltda,Osasco,SP,MAN,economy,28,5,0.88

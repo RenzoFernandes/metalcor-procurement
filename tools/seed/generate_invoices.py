@@ -12,6 +12,15 @@ holidays are not modelled), except due_date, which is invoice_date + the supplie
 Late payment: a payment is late when its scheduled date is after the due date, moved to the next business
 day when the due date falls on a weekend (a weekend due date is payable on the next business day).
 
+Exception rates by supplier tier: price_divergence, quantity_divergence and invoice_before_receipt are
+drawn with a probability that is 2 times higher for economy suppliers than for premium ones (TIER_RATIO).
+The two rates are calibrated so that the average rate over all invoices (weighted by the number of received
+orders of each tier, which is the number of candidate invoices) stays equal to the base rates below
+(BEFORE_RATE, PRICE_RATE, QTY_RATE); the noise rate is the same for both tiers. Of the 8 near-duplicates,
+6 copy an invoice of an economy supplier and 2 of a premium one (DUPLICATE_TIERS). The 6 stale blocked
+invoices are taken from the old price/quantity divergences, economy first. The random draws keep their
+order, so 01, 02 and 03 are untouched and only some cases of 04 change.
+
 Usage (from anywhere):  python tools/seed/generate_invoices.py
 """
 import random
@@ -42,16 +51,13 @@ NUMBER_START_MIN, NUMBER_START_MAX = 1000, 60000
 NUMBER_JUMP_MIN, NUMBER_JUMP_MAX = 1, 40
 
 # ---- kinds of invoice (one draw per invoice, exclusive) ----
+# average rates over all invoices; each tier gets its own rate (see tier_thresholds)
 BEFORE_RATE = 0.02    # only single-delivery orders
 PRICE_RATE = 0.05
 QTY_RATE = 0.015
 NOISE_RATE = 0.06
-
-# thresholds of the exclusive kinds (cumulative)
-PRICE_RATE_LOW = BEFORE_RATE
-PRICE_RATE_HIGH = BEFORE_RATE + PRICE_RATE
-QTY_RATE_HIGH = PRICE_RATE_HIGH + QTY_RATE
-NOISE_RATE_HIGH = QTY_RATE_HIGH + NOISE_RATE
+TIER_RATIO = 2        # economy rate : premium rate
+TIERS = ("economy", "premium")
 
 NOISE_BPS = (30, 178)                       # +0.30% to +1.78% (must stay within 0.3% to 1.8%)
 PRICE_LOW_BPS, PRICE_HIGH_BPS = (250, 490), (510, 1190)
@@ -65,6 +71,14 @@ STALE_COUNT = 6
 STALE_MIN_AGE_DAYS = 45
 DUPLICATE_COUNT, DUPLICATE_PAID, DUPLICATE_BLOCKED, DUPLICATE_CANCELLED = 8, 2, 3, 3
 DUPLICATE_MIN_BD, DUPLICATE_MAX_BD = 1, 5
+# (destination, tier of the original invoice): 6 economy and 2 premium, 2 paid, 3 blocked, 3 cancelled
+DUPLICATE_TIERS = [("paid", "economy"), ("paid", "premium"),
+                   ("blocked", "economy"), ("blocked", "economy"), ("blocked", "premium"),
+                   ("cancelled", "economy"), ("cancelled", "economy"), ("cancelled", "economy")]
+assert len(DUPLICATE_TIERS) == DUPLICATE_COUNT
+assert sum(d == "paid" for d, _ in DUPLICATE_TIERS) == DUPLICATE_PAID
+assert sum(d == "blocked" for d, _ in DUPLICATE_TIERS) == DUPLICATE_BLOCKED
+assert sum(d == "cancelled" for d, _ in DUPLICATE_TIERS) == DUPLICATE_CANCELLED
 APPROVAL_MIN_BD, APPROVAL_MAX_BD = 1, 3
 NEW_INVOICE_DAYS = 3                        # postings in the last 3 business days are still received/matched
 NEW_RECEIVED_SHARE = 0.60
@@ -111,6 +125,23 @@ def raise_quantity(rng, quantity):
 
 def pct_bps(new, old):
     return (new - old) / old * 10000
+
+
+def tier_thresholds(counts):
+    """{tier: (before, price_high, qty_high, noise_high)} cumulative thresholds of the exclusive kinds.
+
+    Economy rate = TIER_RATIO x premium rate, and the average of the two weighted by counts stays at the
+    base rate: premium = base * total / (TIER_RATIO * n_economy + n_premium)."""
+    total = counts["economy"] + counts["premium"]
+    factor = total / (TIER_RATIO * counts["economy"] + counts["premium"])
+    thresholds = {}
+    for tier in TIERS:
+        k = factor * (TIER_RATIO if tier == "economy" else 1)
+        before = BEFORE_RATE * k
+        price_high = before + PRICE_RATE * k
+        qty_high = price_high + QTY_RATE * k
+        thresholds[tier] = (before, price_high, qty_high, qty_high + NOISE_RATE)
+    return thresholds
 
 
 # ---------------------------------------------------------------------------
@@ -160,8 +191,11 @@ def build_invoices(rng, master, orders, receipts, statuses):
     managers = [u["id"] for u in users if u["role"] == "manager"]
     assert finance and approvers and managers, "a required role has no user"
 
+    tier_of = {s["id"]: s["price_tier"] for s in master["suppliers"]}
     last_days = set(BDAYS[-NEW_INVOICE_DAYS:])
     invoices = []
+    candidates = received_orders(orders, receipts, statuses)
+    thresholds = tier_thresholds(Counter(tier_of[o["supplier_id"]] for o, _, _, _ in candidates))
 
     def add(order, kind, invoice_date, posting_date, got, price_of=None, qty_of=None):
         inv = new_invoice(len(invoices), order, kind, invoice_date, posting_date, got,
@@ -171,10 +205,11 @@ def build_invoices(rng, master, orders, receipts, statuses):
         return inv
 
     # -- 1-6. what each invoice looks like when it arrives --
-    for order, last_receipt, got, single in received_orders(orders, receipts, statuses):
+    for order, last_receipt, got, single in candidates:
         normal_date = shift(last_receipt, rng.randint(INVOICE_MIN_BD, INVOICE_MAX_BD))
         u = rng.random()
-        if u < BEFORE_RATE and single and shift(last_receipt, -1) >= order["date"]:
+        before_high, price_high, qty_high, noise_high = thresholds[tier_of[order["supplier_id"]]]
+        if u < before_high and single and shift(last_receipt, -1) >= order["date"]:
             invoice_date = max(shift(last_receipt, -rng.randint(BEFORE_MIN_BD, BEFORE_MAX_BD)), order["date"])
             posting_date = min(shift(invoice_date, rng.randint(0, POSTING_MAX_BD)), shift(last_receipt, -1))
             inv = add(order, "before_receipt", invoice_date, posting_date, got)
@@ -183,11 +218,11 @@ def build_invoices(rng, master, orders, receipts, statuses):
         if normal_date > END:
             continue
         posting_date = min(shift(normal_date, rng.randint(0, POSTING_MAX_BD)), END)
-        if PRICE_RATE_LOW <= u < PRICE_RATE_HIGH:
+        if before_high <= u < price_high:
             kind = "price"
-        elif PRICE_RATE_HIGH <= u < QTY_RATE_HIGH:
+        elif price_high <= u < qty_high:
             kind = "quantity"
-        elif QTY_RATE_HIGH <= u < NOISE_RATE_HIGH:
+        elif qty_high <= u < noise_high:
             kind = "noise"
         else:
             kind = "normal"
@@ -223,7 +258,12 @@ def build_invoices(rng, master, orders, receipts, statuses):
     # -- 7. stale blocked divergences: old, never resolved --
     old_divergences = [i for i in invoices if i["kind"] in ("price", "quantity")
                        and (END - i["posting_date"]).days > STALE_MIN_AGE_DAYS]
-    for inv in rng.sample(old_divergences, STALE_COUNT):
+    old_economy = [i for i in old_divergences if tier_of[i["supplier_id"]] == "economy"]
+    old_premium = [i for i in old_divergences if tier_of[i["supplier_id"]] != "economy"]
+    stale = rng.sample(old_economy, min(STALE_COUNT, len(old_economy)))
+    if len(stale) < STALE_COUNT:                       # not enough economy ones: complete with premium
+        stale += rng.sample(old_premium, STALE_COUNT - len(stale))
+    for inv in stale:
         inv["stale"] = True
 
     # -- 3-7, 9-10. status flow and payments of every invoice --
@@ -284,11 +324,10 @@ def build_invoices(rng, master, orders, receipts, statuses):
     last_ok = shift(END, -DUPLICATE_MAX_BD)
     pool = [i for i in invoices if i["kind"] == "normal" and i["posting_date"] <= last_ok]
     paid_pool = [i for i in pool if i["status"] == "paid"]
-    destinations = (["paid"] * DUPLICATE_PAID + ["blocked"] * DUPLICATE_BLOCKED
-                    + ["cancelled"] * DUPLICATE_CANCELLED)
     used = set()
-    for destination in destinations:
-        candidates = [i for i in (paid_pool if destination == "paid" else pool) if i["seq"] not in used]
+    for destination, tier in DUPLICATE_TIERS:
+        candidates = [i for i in (paid_pool if destination == "paid" else pool)
+                      if i["seq"] not in used and tier_of[i["supplier_id"]] == tier]
         rng.shuffle(candidates)
         for original in candidates:
             posting = shift(original["posting_date"], rng.randint(DUPLICATE_MIN_BD, DUPLICATE_MAX_BD))
@@ -317,7 +356,7 @@ def build_invoices(rng, master, orders, receipts, statuses):
             used.add(original["seq"])
             break
         else:
-            raise RuntimeError(f"no original found for a {destination} duplicate")
+            raise RuntimeError(f"no {tier} original found for a {destination} duplicate")
     return invoices
 
 
@@ -465,7 +504,18 @@ def check(invoices, payments, receipts, master):
         assert p["reference"][:4] in ("PIX-", "BOL-", "TED-") and len(p["reference"]) == 12
 
 
-def print_report(invoices, payments, orders, statuses):
+PREVIOUS_COUNTS = {"price_divergence": 77, "quantity_divergence": 20, "invoice_before_receipt": 28,
+                   "duplicate_invoice": 8, "duplicate_payment": 2, "late_payment": 31,
+                   "stale_blocked_invoice": 6}
+
+
+def print_report(invoices, payments, orders, statuses, master):
+    tier_of = {s["id"]: s["price_tier"] for s in master["suppliers"]}
+    print("\nExceções por tipo de fornecedor (divergência de preço ou quantidade, antes do recebimento, duplicidade):")
+    for tier in TIERS:
+        mine = [i for i in invoices if tier_of[i["supplier_id"]] == tier]
+        hits = [i for i in mine if i["kind"] in ("price", "quantity", "before_receipt", "duplicate")]
+        print(f"  {tier}: {len(mine)} faturas, {len(hits)} exceções, taxa {100 * len(hits) / len(mine):.1f}%")
     print(f"\nFaturas: {len(invoices)} ({sum(len(i['items']) for i in invoices)} itens)")
     by_status = Counter(i["status"] for i in invoices)
     for status in ("received", "matched", "blocked", "approved", "paid", "cancelled"):
@@ -488,7 +538,13 @@ def print_report(invoices, payments, orders, statuses):
           f"do recebimento ou duplicidade)")
     print(f"  incluindo pagamento atrasado: {100 * len(with_late) / len(invoices):.1f}% ({len(with_late)})")
 
-    print("\nAnomalias:")
+    print("\nAnomalias (agora, anterior entre parênteses):")
+    now = {"price_divergence": kinds["price"], "quantity_divergence": kinds["quantity"],
+           "invoice_before_receipt": kinds["before_receipt"], "duplicate_invoice": kinds["duplicate"],
+           "duplicate_payment": len(dup_paid), "late_payment": len(late), "stale_blocked_invoice": len(stale)}
+    for name, n in now.items():
+        print(f"  {name}: {n} (antes {PREVIOUS_COUNTS[name]}, {n - PREVIOUS_COUNTS[name]:+d})")
+    print("\nDetalhe:")
     print(f"  price_divergence: {kinds['price']} "
           f"(faixa até 5%: {sum(1 for i in invoices if i['kind'] == 'price' and not i['price_band_high'])}, "
           f"acima de 5%: {sum(1 for i in invoices if i['kind'] == 'price' and i['price_band_high'])})")
@@ -567,7 +623,7 @@ def main():
                      "duplicate_payment", "late_payment", "stale_blocked_invoice"}, manifest)
 
     print(f"Wrote {OUTPUT_SQL}")
-    print_report(invoices, payments, orders, statuses)
+    print_report(invoices, payments, orders, statuses, master)
 
 
 if __name__ == "__main__":

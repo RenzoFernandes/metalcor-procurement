@@ -1,0 +1,16 @@
+services:
+  db:
+    image: postgres:17
+    container_name: metalcor-db
+    environment:
+      POSTGRES_DB: metalcor
+      POSTGRES_USER: ${DB_USER:-metalcor}
+      POSTGRES_PASSWORD: ${DB_PASSWORD:-metalcor_dev}
+    ports:
+      - "127.0.0.1:${DB_PORT:-5432}:5432"
+    volumes:
+      - db_data:/var/lib/postgresql/data
+      - ./db/init:/docker-entrypoint-initdb.d
+
+volumes:
+  db_data:

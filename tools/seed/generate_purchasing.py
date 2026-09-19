@@ -513,10 +513,31 @@ def print_report(master, requisitions, approvals, orders, anomaly_numbers):
     print(f"\nAnomalias plantadas: {len(anomaly_numbers)} (pedido sem aprovação)")
 
 
-def main():
-    if hasattr(sys.stdout, "reconfigure"):
-        sys.stdout.reconfigure(encoding="utf-8", errors="replace")
+def update_manifest(types, rows):
+    """Replaces the manifest rows of the given anomaly types with `rows` (type, table, document_number).
 
+    Rows of other types are kept, so each generator only owns its own anomaly types.
+    """
+    existing = []
+    if MANIFEST_CSV.exists():
+        with open(MANIFEST_CSV, encoding="utf-8", newline="") as f:
+            existing = [r for r in csv.reader(f)][1:]
+    kept = [r for r in existing if r[0] not in types]
+    order = list(dict.fromkeys([r[0] for r in kept] + [r[0] for r in rows]))
+    merged = kept + [list(r) for r in rows]
+    merged.sort(key=lambda r: (order.index(r[0]), r[2]))
+    with open(MANIFEST_CSV, "w", encoding="utf-8", newline="") as f:
+        writer = csv.writer(f, lineterminator="\n")
+        writer.writerow(["type", "table", "document_number"])
+        writer.writerows(merged)
+
+
+def build_purchasing():
+    """Runs the whole purchasing simulation (random.Random(43)).
+
+    Returns (master, requisitions, approvals, orders, anomaly_numbers, numbers). Orders are in id order,
+    each with its items (id, quantity, unit_price...), expected_delivery_date, plant_id and supplier_id.
+    """
     rng = random.Random(SEED)
     master = build_master()
 
@@ -530,15 +551,20 @@ def main():
     requisitions, approvals = build_requisitions(rng, master, lines, numbers)
     orders, anomaly_numbers = build_orders(rng, master, requisitions, numbers)
     check(requisitions, approvals, orders, anomaly_numbers, set(BDAYS[-3:]))
+    return master, requisitions, approvals, orders, anomaly_numbers, numbers
+
+
+def main():
+    if hasattr(sys.stdout, "reconfigure"):
+        sys.stdout.reconfigure(encoding="utf-8", errors="replace")
+
+    master, requisitions, approvals, orders, anomaly_numbers, numbers = build_purchasing()
 
     OUTPUT_SQL.parent.mkdir(parents=True, exist_ok=True)
     with open(OUTPUT_SQL, "w", encoding="utf-8", newline="\n") as f:
         f.write(render_sql(requisitions, approvals, orders, numbers))
-    with open(MANIFEST_CSV, "w", encoding="utf-8", newline="") as f:
-        writer = csv.writer(f, lineterminator="\n")
-        writer.writerow(["type", "table", "document_number"])
-        for number in sorted(anomaly_numbers):
-            writer.writerow(["order_without_approval", "purchase_orders", number])
+    update_manifest({"order_without_approval"},
+                    [("order_without_approval", "purchase_orders", n) for n in sorted(anomaly_numbers)])
 
     print(f"Wrote {OUTPUT_SQL}")
     print(f"Wrote {MANIFEST_CSV}")

@@ -11,3 +11,7 @@ node_modules/
 
 # Segredos e ambiente local
 .env
+
+# Python
+__pycache__/
+*.pyc

@@ -172,7 +172,7 @@ CREATE TRIGGER trg_suppliers_set_updated_at
     BEFORE UPDATE ON suppliers
     FOR EACH ROW EXECUTE FUNCTION set_updated_at();
 
-COMMENT ON TABLE  suppliers                    IS 'Supplier master. Names are real companies used only as fictional examples.';
+COMMENT ON TABLE  suppliers                    IS 'Supplier master. All suppliers are fictional.';
 COMMENT ON COLUMN suppliers.code               IS 'Unique business code of the supplier.';
 COMMENT ON COLUMN suppliers.name               IS 'Supplier name.';
 COMMENT ON COLUMN suppliers.city               IS 'Supplier city.';

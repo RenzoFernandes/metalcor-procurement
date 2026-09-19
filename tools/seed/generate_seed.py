@@ -4,6 +4,9 @@
 Part A of the seed (master data only). Standard library only, fixed seed (42), so the
 output is reproducible. Reads data/seed/suppliers.csv and data/seed/materials.csv.
 
+build_master() returns the master data as Python structures (same ids as the SQL file),
+so the later seed parts (generate_purchasing.py, ...) can reuse it.
+
 Usage (from anywhere):  python tools/seed/generate_seed.py
 """
 import csv
@@ -80,6 +83,41 @@ PRICE_V2_FROM = "2026-04-01"
 CENT4 = Decimal("0.0001")
 THOUSANDTH = Decimal("0.001")
 
+# Audit triggers are disabled only while a seed script loads its data.
+DISABLE_AUDIT_SQL = (
+    "-- Audit triggers are disabled only for this initial load and re-enabled at the end.\n"
+    "-- Only triggers that call audit_row_change() are touched; no other trigger or constraint is changed.\n"
+    "DO $$\n"
+    "DECLARE\n"
+    "    t record;\n"
+    "BEGIN\n"
+    "    FOR t IN\n"
+    "        SELECT tgrelid::regclass AS table_name, tgname\n"
+    "          FROM pg_trigger\n"
+    "         WHERE tgfoid = 'audit_row_change'::regproc\n"
+    "           AND NOT tgisinternal\n"
+    "    LOOP\n"
+    "        EXECUTE format('ALTER TABLE %s DISABLE TRIGGER %I', t.table_name, t.tgname);\n"
+    "    END LOOP;\n"
+    "END;\n"
+    "$$;\n\n")
+
+ENABLE_AUDIT_SQL = (
+    "DO $$\n"
+    "DECLARE\n"
+    "    t record;\n"
+    "BEGIN\n"
+    "    FOR t IN\n"
+    "        SELECT tgrelid::regclass AS table_name, tgname\n"
+    "          FROM pg_trigger\n"
+    "         WHERE tgfoid = 'audit_row_change'::regproc\n"
+    "           AND NOT tgisinternal\n"
+    "    LOOP\n"
+    "        EXECUTE format('ALTER TABLE %s ENABLE TRIGGER %I', t.table_name, t.tgname);\n"
+    "    END LOOP;\n"
+    "END;\n"
+    "$$;\n\n")
+
 
 def q(text):
     """SQL string literal."""
@@ -120,7 +158,15 @@ def insert_sql(table, columns, rows):
             + ",\n".join(lines) + ";\n")
 
 
-def main():
+def build_master():
+    """Builds the master data (random.Random(42)) with the same ids as 01_master_data.sql.
+
+    Returns a dict with:
+      suppliers, materials, users: lists of dicts (key "id" is the database id);
+      supplier_materials: list of dicts, price-list version 1 then 2 per supplier/material;
+      plant_ids, category_ids, unit_ids: code -> id;
+      cost_center_ids: (plant code, cost center code) -> id.
+    """
     rng = random.Random(SEED)
     suppliers_csv = read_csv(SUPPLIERS_CSV)
     materials_csv = read_csv(MATERIALS_CSV)
@@ -135,6 +181,74 @@ def main():
     for s in suppliers_csv:
         assert s["category_code"] in category_ids, f"unknown category {s['category_code']}"
         assert s["price_tier"] in ("economy", "premium"), f"unknown tier {s['price_tier']}"
+
+    # cost_centers: every cost center in every plant, ids in load order
+    cost_center_ids = {}
+    for plant_code, *_ in PLANTS:
+        for cc_code, _ in COST_CENTERS:
+            cost_center_ids[(plant_code, cc_code)] = len(cost_center_ids) + 1
+
+    suppliers = []
+    for si, s in enumerate(suppliers_csv, start=1):
+        suppliers.append({
+            "id": si, "code": s["code"], "name": s["name"], "city": s["city"], "state": s["state"],
+            "category_code": s["category_code"], "price_tier": s["price_tier"],
+            "payment_terms_days": int(s["payment_terms_days"]),
+            "lead_time_days": int(s["lead_time_days"]),
+            "on_time_rate": Decimal(s["on_time_rate"]),
+        })
+
+    # materials: standard_price = midpoint of the CSV price range
+    materials = []
+    for mi, m in enumerate(materials_csv, start=1):
+        price = ((Decimal(m["price_min"]) + Decimal(m["price_max"])) / 2).quantize(CENT4, ROUND_HALF_UP)
+        materials.append({
+            "id": mi, "code": m["code"], "description": m["description"],
+            "category_code": m["category_code"], "category_id": category_ids[m["category_code"]],
+            "unit": m["unit"], "unit_id": unit_ids[m["unit"]], "standard_price": price,
+            "monthly_qty_min": int(m["monthly_qty_min"]), "monthly_qty_max": int(m["monthly_qty_max"]),
+        })
+
+    # supplier_materials: every supplier x every material of its category, two price-list versions
+    supplier_materials = []
+    for s, s_csv in zip(suppliers, suppliers_csv):
+        if s["price_tier"] == "economy":
+            low, high = 0.10, 0.25
+        else:
+            low, high = 0.75, 0.90
+        for m, m_csv in zip(materials, materials_csv):
+            if m["category_code"] != s["category_code"]:
+                continue
+            pmin, pmax = Decimal(m_csv["price_min"]), Decimal(m_csv["price_max"])
+            fraction = Decimal(str(round(rng.uniform(low, high), 4)))
+            price_v1 = (pmin + fraction * (pmax - pmin)).quantize(CENT4, ROUND_HALF_UP)
+            lead_time = max(1, s["lead_time_days"] + rng.randint(-2, 2))
+            moq_base = int(m_csv["monthly_qty_min"]) * rng.choice([0.05, 0.10, 0.15])
+            moq = nice_moq(moq_base, m["unit"])
+            increase = Decimal(str(round(rng.uniform(0.03, 0.08), 4)))
+            price_v2 = (price_v1 * (1 + increase)).quantize(CENT4, ROUND_HALF_UP)
+
+            common = {"supplier_id": s["id"], "material_id": m["id"],
+                      "lead_time_days": lead_time, "min_order_qty": moq}
+            supplier_materials.append({**common, "version": 1, "unit_price": price_v1,
+                                       "valid_from": PRICE_V1_FROM, "valid_to": PRICE_V1_TO})
+            supplier_materials.append({**common, "version": 2, "unit_price": price_v2,
+                                       "valid_from": PRICE_V2_FROM, "valid_to": None})
+
+    users = [{"id": i, "name": name, "email": email, "role": role, "plant_code": plant,
+              "plant_id": plant_ids[plant] if plant else None}
+             for i, (name, email, role, plant) in enumerate(USERS, start=1)]
+
+    return {
+        "suppliers": suppliers, "materials": materials, "supplier_materials": supplier_materials,
+        "users": users, "plant_ids": plant_ids, "category_ids": category_ids, "unit_ids": unit_ids,
+        "cost_center_ids": cost_center_ids,
+    }
+
+
+def main():
+    master = build_master()
+    plant_ids = master["plant_ids"]
 
     counts = {}
     body = []
@@ -164,46 +278,25 @@ def main():
 
     # suppliers
     rows = [[q(s["code"]), q(s["name"]), q(s["city"]), q(s["state"]), q("BR"),
-             s["payment_terms_days"], "true"] for s in suppliers_csv]
+             str(s["payment_terms_days"]), "true"] for s in master["suppliers"]]
     body.append(insert_sql(
         "suppliers", ["code", "name", "city", "state", "country", "payment_terms_days", "active"], rows))
     counts["suppliers"] = len(rows)
 
-    # materials: standard_price = midpoint of the CSV price range
-    rows = []
-    for m in materials_csv:
-        price = ((Decimal(m["price_min"]) + Decimal(m["price_max"])) / 2).quantize(CENT4, ROUND_HALF_UP)
-        rows.append([q(m["code"]), q(m["description"]), str(category_ids[m["category_code"]]),
-                     str(unit_ids[m["unit"]]), num(price), "true"])
+    # materials
+    rows = [[q(m["code"]), q(m["description"]), str(m["category_id"]),
+             str(m["unit_id"]), num(m["standard_price"]), "true"] for m in master["materials"]]
     body.append(insert_sql(
         "materials",
         ["code", "description", "material_category_id", "unit_of_measure_id", "standard_price", "active"],
         rows))
     counts["materials"] = len(rows)
 
-    # supplier_materials: every supplier x every material of its category, two price-list versions
-    rows = []
-    for si, s in enumerate(suppliers_csv, start=1):
-        if s["price_tier"] == "economy":
-            low, high = 0.10, 0.25
-        else:
-            low, high = 0.75, 0.90
-        for mi, m in enumerate(materials_csv, start=1):
-            if m["category_code"] != s["category_code"]:
-                continue
-            pmin, pmax = Decimal(m["price_min"]), Decimal(m["price_max"])
-            fraction = Decimal(str(round(rng.uniform(low, high), 4)))
-            price_v1 = (pmin + fraction * (pmax - pmin)).quantize(CENT4, ROUND_HALF_UP)
-            lead_time = max(1, int(s["lead_time_days"]) + rng.randint(-2, 2))
-            moq_base = int(m["monthly_qty_min"]) * rng.choice([0.05, 0.10, 0.15])
-            moq = nice_moq(moq_base, m["unit"])
-            increase = Decimal(str(round(rng.uniform(0.03, 0.08), 4)))
-            price_v2 = (price_v1 * (1 + increase)).quantize(CENT4, ROUND_HALF_UP)
-
-            rows.append([str(si), str(mi), num(price_v1), str(lead_time), num(moq),
-                         q(PRICE_V1_FROM), q(PRICE_V1_TO)])
-            rows.append([str(si), str(mi), num(price_v2), str(lead_time), num(moq),
-                         q(PRICE_V2_FROM), "NULL"])
+    # supplier_materials
+    rows = [[str(sm["supplier_id"]), str(sm["material_id"]), num(sm["unit_price"]),
+             str(sm["lead_time_days"]), num(sm["min_order_qty"]),
+             q(sm["valid_from"]), q(sm["valid_to"]) if sm["valid_to"] else "NULL"]
+            for sm in master["supplier_materials"]]
     body.append(insert_sql(
         "supplier_materials",
         ["supplier_id", "material_id", "unit_price", "lead_time_days", "min_order_qty", "valid_from", "valid_to"],
@@ -211,8 +304,8 @@ def main():
     counts["supplier_materials"] = len(rows)
 
     # app_users
-    rows = [[q(name), q(email), q(role), str(plant_ids[plant]) if plant else "NULL", "true"]
-            for name, email, role, plant in USERS]
+    rows = [[q(u["name"]), q(u["email"]), q(u["role"]),
+             str(u["plant_id"]) if u["plant_id"] else "NULL", "true"] for u in master["users"]]
     body.append(insert_sql("app_users", ["name", "email", "role", "plant_id", "active"], rows))
     counts["app_users"] = len(rows)
 
@@ -223,43 +316,12 @@ def main():
                "-- Fictional data for a portfolio project. Any resemblance to real companies is coincidental.\n\n")
     out.append("SET client_encoding = 'UTF8';\n\n")
     out.append("BEGIN;\n\n")
-    out.append(
-        "-- Audit triggers are disabled only for this initial load and re-enabled at the end.\n"
-        "-- Only triggers that call audit_row_change() are touched; no other trigger or constraint is changed.\n"
-        "DO $$\n"
-        "DECLARE\n"
-        "    t record;\n"
-        "BEGIN\n"
-        "    FOR t IN\n"
-        "        SELECT tgrelid::regclass AS table_name, tgname\n"
-        "          FROM pg_trigger\n"
-        "         WHERE tgfoid = 'audit_row_change'::regproc\n"
-        "           AND NOT tgisinternal\n"
-        "    LOOP\n"
-        "        EXECUTE format('ALTER TABLE %s DISABLE TRIGGER %I', t.table_name, t.tgname);\n"
-        "    END LOOP;\n"
-        "END;\n"
-        "$$;\n\n")
+    out.append(DISABLE_AUDIT_SQL)
     out.append("\n".join(body))
     out.append("\n-- Sequences continue after the explicit ids.\n")
     for table in TABLE_ORDER:
         out.append(f"SELECT setval(pg_get_serial_sequence('{table}', 'id'), (SELECT max(id) FROM {table}));\n")
-    out.append(
-        "\nDO $$\n"
-        "DECLARE\n"
-        "    t record;\n"
-        "BEGIN\n"
-        "    FOR t IN\n"
-        "        SELECT tgrelid::regclass AS table_name, tgname\n"
-        "          FROM pg_trigger\n"
-        "         WHERE tgfoid = 'audit_row_change'::regproc\n"
-        "           AND NOT tgisinternal\n"
-        "    LOOP\n"
-        "        EXECUTE format('ALTER TABLE %s ENABLE TRIGGER %I', t.table_name, t.tgname);\n"
-        "    END LOOP;\n"
-        "END;\n"
-        "$$;\n\n"
-        "COMMIT;\n")
+    out.append("\n" + ENABLE_AUDIT_SQL + "COMMIT;\n")
 
     OUTPUT_SQL.parent.mkdir(parents=True, exist_ok=True)
     with open(OUTPUT_SQL, "w", encoding="utf-8", newline="\n") as f:

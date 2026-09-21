@@ -11,7 +11,29 @@ services:
       - "127.0.0.1:${DB_PORT:-5432}:5432"
     volumes:
       - db_data:/var/lib/postgresql/data
-      - ./db/init:/docker-entrypoint-initdb.d
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $${POSTGRES_USER} -d $${POSTGRES_DB}"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  flyway:
+    image: flyway/flyway:11.4.0
+    container_name: metalcor-flyway
+    restart: "no"
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      FLYWAY_URL: jdbc:postgresql://db:5432/metalcor
+      FLYWAY_USER: ${DB_USER:-metalcor}
+      FLYWAY_PASSWORD: ${DB_PASSWORD:-metalcor_dev}
+    command:
+      - -placeholders.app_db_password=${APP_DB_PASSWORD:-metalcor_app_dev}
+      - -placeholders.readonly_db_password=${READONLY_DB_PASSWORD:-metalcor_readonly_dev}
+      - migrate
+    volumes:
+      - ./db/init:/flyway/sql:ro
 
 volumes:
   db_data:

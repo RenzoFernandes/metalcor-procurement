@@ -1,0 +1,20 @@
+spring:
+  application:
+    name: procurement-api
+  datasource:
+    url: jdbc:postgresql://${DB_HOST:localhost}:${DB_PORT:5432}/${DB_NAME:metalcor}
+    username: ${APP_DB_USER:metalcor_app}
+    # No default on purpose: the app does not start without it.
+    password: ${APP_DB_PASSWORD}
+  mvc:
+    problemdetails:
+      enabled: true
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health
+  endpoint:
+    health:
+      show-details: never

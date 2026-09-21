@@ -1,0 +1,6 @@
+# Local development only (fictional data, no value outside this machine). Never use in production.
+# The port can be changed with DB_PORT (for example DB_PORT=5434); an APP_DB_PASSWORD
+# environment variable, when set, wins over the default below.
+spring:
+  datasource:
+    password: ${APP_DB_PASSWORD:metalcor_app_dev}

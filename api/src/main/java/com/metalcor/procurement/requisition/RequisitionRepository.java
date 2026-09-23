@@ -192,6 +192,12 @@ public class RequisitionRepository {
                 .update();
     }
 
+    public void close(long id) {
+        jdbc.sql("UPDATE purchase_requisitions SET status = 'closed' WHERE id = :id")
+                .param("id", id)
+                .update();
+    }
+
     public void reject(long id, String reason) {
         jdbc.sql("""
                 UPDATE purchase_requisitions

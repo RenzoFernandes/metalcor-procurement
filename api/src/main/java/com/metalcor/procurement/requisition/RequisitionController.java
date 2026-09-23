@@ -1,11 +1,14 @@
 package com.metalcor.procurement.requisition;
 
+import com.metalcor.procurement.order.IssueOrderResponse;
+import com.metalcor.procurement.order.PurchaseOrderService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.enums.ParameterIn;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import java.net.URI;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -23,9 +26,11 @@ public class RequisitionController {
             "Id of the acting user (app_users.id), must be active. Provisional auth until login exists.";
 
     private final RequisitionService service;
+    private final PurchaseOrderService purchaseOrderService;
 
-    public RequisitionController(RequisitionService service) {
+    public RequisitionController(RequisitionService service, PurchaseOrderService purchaseOrderService) {
         this.service = service;
+        this.purchaseOrderService = purchaseOrderService;
     }
 
     @PostMapping
@@ -54,5 +59,12 @@ public class RequisitionController {
     @Operation(summary = "Get a purchase requisition by id")
     public RequisitionResponse get(@PathVariable long id) {
         return service.get(id);
+    }
+
+    @PostMapping("/{id}/issue-order")
+    @Operation(summary = "Issue one purchase order per supplier from an approved requisition, then close it",
+            parameters = @Parameter(name = "X-User-Id", in = ParameterIn.HEADER, required = true, description = USER_HEADER_DESCRIPTION))
+    public ResponseEntity<IssueOrderResponse> issueOrder(@PathVariable long id) {
+        return ResponseEntity.status(HttpStatus.CREATED).body(purchaseOrderService.issueOrder(id));
     }
 }

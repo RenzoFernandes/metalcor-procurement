@@ -12,8 +12,8 @@ public class OpenApiConfig {
     OpenAPI procurementOpenApi() {
         return new OpenAPI().info(new Info()
                 .title("Metalcor Procurement API")
-                .version("0.3.0")
-                .description("Read-only endpoints over the SQL views of a procure-to-pay mini-ERP. "
+                .version("0.4.0")
+                .description("Endpoints of a procure-to-pay mini-ERP. Writes require a provisional X-User-Id header. "
                         + "Study project: companies, suppliers and data are fictional. Not SAP."));
     }
 }

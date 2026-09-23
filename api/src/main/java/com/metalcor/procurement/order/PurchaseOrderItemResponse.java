@@ -6,6 +6,7 @@ import java.math.BigDecimal;
 
 @Schema(description = "Purchase order line item.")
 public record PurchaseOrderItemResponse(
+        Long id,
         MaterialRef material,
         BigDecimal quantity,
         BigDecimal unitPrice,

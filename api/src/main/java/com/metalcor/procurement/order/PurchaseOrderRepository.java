@@ -32,7 +32,7 @@ public class PurchaseOrderRepository {
             """;
 
     private static final String ITEMS_SQL = """
-            SELECT i.quantity, i.unit_price, i.line_total,
+            SELECT i.id, i.quantity, i.unit_price, i.line_total,
                    m.id AS material_id, m.code AS material_code, m.description AS material_description
               FROM purchase_order_items i
               JOIN materials m ON m.id = i.material_id
@@ -163,6 +163,7 @@ public class PurchaseOrderRepository {
 
     private static PurchaseOrderItemResponse mapItem(ResultSet rs, int rowNum) throws SQLException {
         return new PurchaseOrderItemResponse(
+                rs.getLong("id"),
                 new MaterialRef(rs.getLong("material_id"), rs.getString("material_code"), rs.getString("material_description")),
                 rs.getBigDecimal("quantity"),
                 rs.getBigDecimal("unit_price"),

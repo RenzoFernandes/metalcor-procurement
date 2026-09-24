@@ -8,6 +8,7 @@ import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.Pattern;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -18,9 +19,17 @@ import org.springframework.web.bind.annotation.RestController;
 public class InvoiceController {
 
     private final InvoiceRepository invoices;
+    private final InvoiceService service;
 
-    public InvoiceController(InvoiceRepository invoices) {
+    public InvoiceController(InvoiceRepository invoices, InvoiceService service) {
         this.invoices = invoices;
+        this.service = service;
+    }
+
+    @GetMapping("/{id}")
+    @Operation(summary = "Get a supplier invoice by id, with the three-way match outcome of each line")
+    public InvoiceResponse get(@PathVariable long id) {
+        return service.get(id);
     }
 
     @GetMapping("/exceptions")

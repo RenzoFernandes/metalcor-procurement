@@ -7,6 +7,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 import com.jayway.jsonpath.JsonPath;
 import com.metalcor.procurement.AbstractIntegrationTest;
+import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
@@ -20,6 +21,7 @@ import org.springframework.test.web.servlet.MvcResult;
  * supplier 3 at 51.6870 and supplier 4 at 26.4882 (cheapest). Requisition totals below stay under
  * 10,000, the buyer approval threshold (approval_rules).
  */
+@Order(2)
 class PurchaseOrderControllerTest extends AbstractIntegrationTest {
 
     private static final String REQUESTER_ID = "1";

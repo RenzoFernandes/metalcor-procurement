@@ -1,5 +1,8 @@
 package com.metalcor.procurement.order;
 
+import com.metalcor.procurement.invoice.InvoiceRequest;
+import com.metalcor.procurement.invoice.InvoiceResponse;
+import com.metalcor.procurement.invoice.InvoiceService;
 import com.metalcor.procurement.receipt.CreateReceiptResponse;
 import com.metalcor.procurement.receipt.ReceiptRequest;
 import com.metalcor.procurement.receipt.ReceiptService;
@@ -27,10 +30,12 @@ public class PurchaseOrderController {
 
     private final PurchaseOrderService service;
     private final ReceiptService receiptService;
+    private final InvoiceService invoiceService;
 
-    public PurchaseOrderController(PurchaseOrderService service, ReceiptService receiptService) {
+    public PurchaseOrderController(PurchaseOrderService service, ReceiptService receiptService, InvoiceService invoiceService) {
         this.service = service;
         this.receiptService = receiptService;
+        this.invoiceService = invoiceService;
     }
 
     @GetMapping("/{id}")
@@ -43,5 +48,13 @@ public class PurchaseOrderController {
             parameters = @Parameter(name = "X-User-Id", in = ParameterIn.HEADER, required = true, description = USER_HEADER_DESCRIPTION))
     public ResponseEntity<CreateReceiptResponse> receive(@PathVariable long id, @Valid @RequestBody ReceiptRequest request) {
         return ResponseEntity.status(HttpStatus.CREATED).body(receiptService.createReceipt(id, request));
+    }
+
+    @PostMapping("/{id}/invoices")
+    @Operation(summary = "Register a supplier invoice against a received or partially received purchase order, "
+            + "running the three-way match automatically",
+            parameters = @Parameter(name = "X-User-Id", in = ParameterIn.HEADER, required = true, description = USER_HEADER_DESCRIPTION))
+    public ResponseEntity<InvoiceResponse> invoice(@PathVariable long id, @Valid @RequestBody InvoiceRequest request) {
+        return ResponseEntity.status(HttpStatus.CREATED).body(invoiceService.createInvoice(id, request));
     }
 }

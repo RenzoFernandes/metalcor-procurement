@@ -8,6 +8,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 import com.jayway.jsonpath.JsonPath;
 import com.metalcor.procurement.AbstractIntegrationTest;
+import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
@@ -18,6 +19,7 @@ import org.springframework.test.web.servlet.MvcResult;
  * Seed users (db/seed/01_master_data.sql): 1 = requester (plant 1), 8 = buyer (plant 1),
  * 10 = approver (plant 1). Approval rule ranges: 0-10000 buyer, 10000-100000 approver, 100000+ manager.
  */
+@Order(1)
 class RequisitionControllerTest extends AbstractIntegrationTest {
 
     private static final String REQUESTER_ID = "1";

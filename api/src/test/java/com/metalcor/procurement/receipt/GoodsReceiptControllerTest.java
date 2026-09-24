@@ -8,6 +8,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 import com.jayway.jsonpath.JsonPath;
 import com.metalcor.procurement.AbstractIntegrationTest;
+import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
@@ -20,6 +21,7 @@ import org.springframework.test.web.servlet.MvcResult;
  * Seed prices (db/seed/01_master_data.sql): material 1 (ACO-001) is sold by supplier 2 at 6.4172
  * (cheapest, no supplier suggested); material 6 (ROL-001) by supplier 4 at 26.4882 (cheapest).
  */
+@Order(3)
 class GoodsReceiptControllerTest extends AbstractIntegrationTest {
 
     private static final String REQUESTER_ID = "1";

@@ -1,0 +1,34 @@
+{
+  "app": {
+    "title": "Metalcor Autopeças",
+    "subtitle": "Procurement (procure-to-pay)",
+    "fictionalNotice": "Study project. Companies, names and data are fictional."
+  },
+  "roles": {
+    "requester": "Requester",
+    "buyer": "Buyer",
+    "approver": "Approver",
+    "finance": "Finance",
+    "manager": "Manager"
+  },
+  "header": {
+    "currentUser": "Current user",
+    "switchUser": "Switch user",
+    "language": "Language"
+  },
+  "nav": {
+    "label": "Navigation",
+    "empty": "Shortcuts will appear here in upcoming versions."
+  },
+  "login": {
+    "title": "Sign in as",
+    "intro": "Pick a user to explore the system. There is no sign-up and no password.",
+    "limitation": "Temporary list of fictional users."
+  },
+  "home": {
+    "welcome": "Welcome, {name}",
+    "roleLine": "You are signed in as {role}.",
+    "scriptTitle": "Test script",
+    "scriptPlaceholder": "The three-task test script to walk through the procurement flow will go here. The tasks will be defined in upcoming versions."
+  }
+}

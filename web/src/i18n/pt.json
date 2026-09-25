@@ -1,0 +1,34 @@
+{
+  "app": {
+    "title": "Metalcor Autopeças",
+    "subtitle": "Compras (procure-to-pay)",
+    "fictionalNotice": "Projeto de estudo. Empresas, nomes e dados são fictícios."
+  },
+  "roles": {
+    "requester": "Solicitante",
+    "buyer": "Comprador",
+    "approver": "Aprovador",
+    "finance": "Financeiro",
+    "manager": "Gestor"
+  },
+  "header": {
+    "currentUser": "Usuário atual",
+    "switchUser": "Trocar usuário",
+    "language": "Idioma"
+  },
+  "nav": {
+    "label": "Navegação",
+    "empty": "Os atalhos aparecerão aqui nas próximas versões."
+  },
+  "login": {
+    "title": "Entrar como",
+    "intro": "Escolha um usuário para explorar o sistema. Não há cadastro nem senha.",
+    "limitation": "Lista provisória de usuários fictícios."
+  },
+  "home": {
+    "welcome": "Bem-vindo(a), {name}",
+    "roleLine": "Você está entrando como {role}.",
+    "scriptTitle": "Roteiro de teste",
+    "scriptPlaceholder": "Aqui vai o roteiro de teste com três tarefas para percorrer o fluxo de compras. As tarefas serão definidas nas próximas versões."
+  }
+}

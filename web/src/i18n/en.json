@@ -18,7 +18,30 @@
   },
   "nav": {
     "label": "Navigation",
-    "empty": "Shortcuts will appear here in upcoming versions."
+    "home": "Home",
+    "newRequisition": "New requisition",
+    "recent": "Recent requisitions",
+    "recentEmpty": "No requisitions created in this session.",
+    "recentNote": "Only requisitions created in this browser session appear here (the API has no listing yet)."
+  },
+  "lookup": {
+    "title": "Find document",
+    "documentLabel": "Document number",
+    "go": "Go",
+    "whichType": "Number {id} is a:",
+    "requisition": "Requisition",
+    "order": "Purchase order",
+    "requisitionById": "View requisition by ID",
+    "orderById": "View order by ID",
+    "invalidId": "Enter digits only (the numeric ID).",
+    "textNotSupported": "Searching by text number (e.g. PR-2026-000973) is not possible yet: the API has no such endpoint. Use the numeric ID.",
+    "note": "Temporary limitation: lookup works by numeric ID only."
+  },
+  "common": {
+    "loading": "Loading…",
+    "saving": "Saving…",
+    "select": "Select…",
+    "optional": "optional"
   },
   "login": {
     "title": "Sign in as",
@@ -30,5 +53,98 @@
     "roleLine": "You are signed in as {role}.",
     "scriptTitle": "Test script",
     "scriptPlaceholder": "The three-task test script to walk through the procurement flow will go here. The tasks will be defined in upcoming versions."
+  },
+  "fields": {
+    "plantId": "Plant",
+    "costCenterId": "Cost center",
+    "neededBy": "Needed by",
+    "notes": "Notes",
+    "items": "Items",
+    "materialId": "Material",
+    "quantity": "Quantity",
+    "unitOfMeasureId": "Unit",
+    "estimatedUnitPrice": "Estimated unit price",
+    "decision": "Decision",
+    "comment": "Comment"
+  },
+  "status": {
+    "draft": "Draft",
+    "pending_approval": "Pending approval",
+    "approved": "Approved",
+    "rejected": "Rejected",
+    "cancelled": "Cancelled",
+    "closed": "Closed",
+    "issued": "Issued",
+    "partially_received": "Partially received",
+    "received": "Received"
+  },
+  "requisition": {
+    "total": "Total",
+    "new": {
+      "title": "New purchase requisition",
+      "intro": "Fill in the header and the items. The requisition is created as a draft.",
+      "requesterOnly": "Only the Requester role creates requisitions. Switch user to continue.",
+      "items": "Items",
+      "line": "Item {n}",
+      "addLine": "Add item",
+      "removeLine": "Remove",
+      "lineCount": "{count} of {max} items",
+      "submit": "Create requisition",
+      "limitation": "Temporary limitation: plants, cost centers, materials and units come from a static copy of the sample data, because the API has no endpoints for these master data yet."
+    },
+    "detail": {
+      "title": "Requisition",
+      "created": "Requisition created as a draft.",
+      "submitted": "Requisition submitted for approval.",
+      "approvedNotice": "Requisition approved.",
+      "rejectedNotice": "Requisition rejected.",
+      "issued": "{count} purchase order(s) issued.",
+      "requestedBy": "Requested by",
+      "approvedBy": "Approved by",
+      "rejectionReason": "Rejection reason",
+      "lineTotal": "Line total",
+      "submitHelp": "The requisition is a draft. Submit it to start the approval.",
+      "submitButton": "Submit for approval",
+      "decisionTitle": "Approval decision",
+      "decisionHelp": "The amount-based rule defines who can decide; if your role is not the required one, the API refuses.",
+      "approve": "Approve",
+      "reject": "Reject",
+      "commentRequired": "A comment is required when rejecting.",
+      "decide": "Record decision",
+      "issueHelp": "Requisition approved. Issue one purchase order per supplier.",
+      "issueButton": "Issue purchase order",
+      "ordersTitle": "Issued orders",
+      "ordersLimitation": "This list only shows now; after a reload, the API has no way yet to list the orders of a requisition."
+    }
+  },
+  "order": {
+    "title": "Purchase order",
+    "supplier": "Supplier",
+    "buyer": "Buyer",
+    "requisition": "Requisition",
+    "orderDate": "Order date",
+    "expectedDelivery": "Expected delivery",
+    "paymentTerms": "Payment terms",
+    "days": "{count} days",
+    "unitPrice": "Unit price"
+  },
+  "errors": {
+    "line": "Item {n}",
+    "unexpected": "Something went wrong. Please try again.",
+    "network": "Could not reach the server. Check that the API is running and try again.",
+    "badRequest": "The data sent is not valid.",
+    "unauthorized": "User not recognized. Switch user and try again.",
+    "forbidden": "Your role cannot perform this action.",
+    "notFound": "We could not find this record.",
+    "conflict": "This action is not possible in the document's current state.",
+    "server": "The server ran into a problem. Please try again later.",
+    "validation": {
+      "headline": "Fix the fields below and try again.",
+      "required": "required field",
+      "positive": "must be greater than zero",
+      "minItems": "include at least one item",
+      "maxItems": "at most 8 items",
+      "decision": "choose approve or reject"
+    }
   }
 }

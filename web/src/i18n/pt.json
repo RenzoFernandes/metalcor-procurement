@@ -18,7 +18,30 @@
   },
   "nav": {
     "label": "Navegação",
-    "empty": "Os atalhos aparecerão aqui nas próximas versões."
+    "home": "Início",
+    "newRequisition": "Nova requisição",
+    "recent": "Requisições recentes",
+    "recentEmpty": "Nenhuma requisição criada nesta sessão.",
+    "recentNote": "Só aparecem as criadas nesta sessão do navegador (a API ainda não tem listagem)."
+  },
+  "lookup": {
+    "title": "Buscar documento",
+    "documentLabel": "Número do documento",
+    "go": "Ir",
+    "whichType": "O número {id} é de:",
+    "requisition": "Requisição",
+    "order": "Pedido",
+    "requisitionById": "Ver requisição por ID",
+    "orderById": "Ver pedido por ID",
+    "invalidId": "Digite só números (o ID numérico).",
+    "textNotSupported": "Ainda não é possível buscar por número textual (ex.: PR-2026-000973): a API não tem esse endpoint. Use o ID numérico.",
+    "note": "Limitação provisória: a busca funciona só pelo ID numérico."
+  },
+  "common": {
+    "loading": "Carregando…",
+    "saving": "Salvando…",
+    "select": "Selecione…",
+    "optional": "opcional"
   },
   "login": {
     "title": "Entrar como",
@@ -30,5 +53,98 @@
     "roleLine": "Você está entrando como {role}.",
     "scriptTitle": "Roteiro de teste",
     "scriptPlaceholder": "Aqui vai o roteiro de teste com três tarefas para percorrer o fluxo de compras. As tarefas serão definidas nas próximas versões."
+  },
+  "fields": {
+    "plantId": "Planta",
+    "costCenterId": "Centro de custo",
+    "neededBy": "Data necessária",
+    "notes": "Observações",
+    "items": "Itens",
+    "materialId": "Material",
+    "quantity": "Quantidade",
+    "unitOfMeasureId": "Unidade",
+    "estimatedUnitPrice": "Preço estimado (unitário)",
+    "decision": "Decisão",
+    "comment": "Comentário"
+  },
+  "status": {
+    "draft": "Rascunho",
+    "pending_approval": "Aguardando aprovação",
+    "approved": "Aprovada",
+    "rejected": "Rejeitada",
+    "cancelled": "Cancelado",
+    "closed": "Encerrado",
+    "issued": "Emitido",
+    "partially_received": "Recebido parcialmente",
+    "received": "Recebido"
+  },
+  "requisition": {
+    "total": "Total",
+    "new": {
+      "title": "Nova requisição de compra",
+      "intro": "Preencha o cabeçalho e os itens. A requisição é criada como rascunho.",
+      "requesterOnly": "Somente o perfil Solicitante cria requisições. Troque de usuário para continuar.",
+      "items": "Itens",
+      "line": "Item {n}",
+      "addLine": "Adicionar item",
+      "removeLine": "Remover",
+      "lineCount": "{count} de {max} itens",
+      "submit": "Criar requisição",
+      "limitation": "Limitação provisória: plantas, centros de custo, materiais e unidades vêm de uma cópia estática dos dados de exemplo, porque a API ainda não tem endpoints para esses cadastros."
+    },
+    "detail": {
+      "title": "Requisição",
+      "created": "Requisição criada como rascunho.",
+      "submitted": "Requisição enviada para aprovação.",
+      "approvedNotice": "Requisição aprovada.",
+      "rejectedNotice": "Requisição rejeitada.",
+      "issued": "{count} pedido(s) de compra emitido(s).",
+      "requestedBy": "Solicitante",
+      "approvedBy": "Aprovada por",
+      "rejectionReason": "Motivo da rejeição",
+      "lineTotal": "Total do item",
+      "submitHelp": "A requisição está em rascunho. Envie para iniciar a aprovação.",
+      "submitButton": "Enviar para aprovação",
+      "decisionTitle": "Decisão de aprovação",
+      "decisionHelp": "A regra por valor define quem pode decidir; se o seu perfil não for o exigido, a API recusa.",
+      "approve": "Aprovar",
+      "reject": "Rejeitar",
+      "commentRequired": "O comentário é obrigatório ao rejeitar.",
+      "decide": "Registrar decisão",
+      "issueHelp": "Requisição aprovada. Emita um pedido de compra por fornecedor.",
+      "issueButton": "Emitir pedido de compra",
+      "ordersTitle": "Pedidos emitidos",
+      "ordersLimitation": "Esta lista só aparece agora; depois de recarregar, a API ainda não tem como listar os pedidos de uma requisição."
+    }
+  },
+  "order": {
+    "title": "Pedido de compra",
+    "supplier": "Fornecedor",
+    "buyer": "Comprador",
+    "requisition": "Requisição",
+    "orderDate": "Data do pedido",
+    "expectedDelivery": "Entrega prevista",
+    "paymentTerms": "Prazo de pagamento",
+    "days": "{count} dias",
+    "unitPrice": "Preço unitário"
+  },
+  "errors": {
+    "line": "Item {n}",
+    "unexpected": "Algo deu errado. Tente novamente.",
+    "network": "Não foi possível falar com o servidor. Verifique se a API está rodando e tente de novo.",
+    "badRequest": "Os dados enviados não são válidos.",
+    "unauthorized": "Usuário não reconhecido. Troque de usuário e tente de novo.",
+    "forbidden": "Seu perfil não pode fazer esta ação.",
+    "notFound": "Não encontramos este registro.",
+    "conflict": "Esta ação não é possível no estado atual do documento.",
+    "server": "O servidor encontrou um problema. Tente novamente mais tarde.",
+    "validation": {
+      "headline": "Corrija os campos abaixo e tente de novo.",
+      "required": "campo obrigatório",
+      "positive": "deve ser maior que zero",
+      "minItems": "inclua pelo menos um item",
+      "maxItems": "no máximo 8 itens",
+      "decision": "escolha aprovar ou rejeitar"
+    }
   }
 }

@@ -4,3 +4,8 @@
 spring:
   datasource:
     password: ${APP_DB_PASSWORD:metalcor_app_dev}
+
+app:
+  cors:
+    # Origin of the Vite dev server. Override with APP_CORS_ALLOWED_ORIGIN.
+    allowed-origin: ${APP_CORS_ALLOWED_ORIGIN:http://localhost:5173}

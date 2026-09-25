@@ -22,18 +22,35 @@ import type {
 const BASE_URL = (import.meta.env.VITE_API_BASE_URL ?? 'http://localhost:8080/api/v1').replace(/\/+$/, '')
 
 /** Error raised for any non-2xx response. Carries the ProblemDetail (RFC 7807) fields. */
+export interface FieldError {
+  field: string
+  message: string
+}
+
 export class ApiError extends Error {
   readonly status: number
   readonly title: string | null
   readonly detail: string | null
+  /** Per-field messages of a 400 validation failure (the "errors" property of the ProblemDetail). */
+  readonly fieldErrors: FieldError[]
 
-  constructor(status: number, title: string | null, detail: string | null) {
+  constructor(status: number, title: string | null, detail: string | null, fieldErrors: FieldError[] = []) {
     super(detail ?? title ?? `HTTP ${status}`)
     this.name = 'ApiError'
     this.status = status
     this.title = title
     this.detail = detail
+    this.fieldErrors = fieldErrors
   }
+}
+
+function parseFieldErrors(value: unknown): FieldError[] {
+  if (!Array.isArray(value)) return []
+  return value.flatMap((entry) =>
+    entry && typeof entry.field === 'string' && typeof entry.message === 'string'
+      ? [{ field: entry.field, message: entry.message }]
+      : [],
+  )
 }
 
 interface RequestOptions {
@@ -71,14 +88,16 @@ async function request<T>(path: string, options: RequestOptions = {}): Promise<T
   if (!response.ok) {
     let title: string | null = null
     let detail: string | null = null
+    let fieldErrors: FieldError[] = []
     try {
       const problem = await response.json()
       title = typeof problem.title === 'string' ? problem.title : null
       detail = typeof problem.detail === 'string' ? problem.detail : null
+      fieldErrors = parseFieldErrors(problem.errors)
     } catch {
       // Body is not a ProblemDetail: keep only the status.
     }
-    throw new ApiError(response.status, title, detail)
+    throw new ApiError(response.status, title, detail, fieldErrors)
   }
 
   return (await response.json()) as T

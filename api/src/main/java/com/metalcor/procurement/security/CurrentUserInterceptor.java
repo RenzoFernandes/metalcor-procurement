@@ -27,6 +27,11 @@ public class CurrentUserInterceptor implements HandlerInterceptor {
 
     @Override
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) {
+        // CORS preflight carries no X-User-Id by design; Spring answers it with the CORS headers.
+        if ("OPTIONS".equalsIgnoreCase(request.getMethod())) {
+            return true;
+        }
+
         String header = request.getHeader(HEADER);
         boolean write = !"GET".equalsIgnoreCase(request.getMethod());
 

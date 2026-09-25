@@ -125,6 +125,13 @@ public class PurchaseOrderRepository {
                 .update();
     }
 
+    public void updateStatus(long id, String status) {
+        jdbc.sql("UPDATE purchase_orders SET status = :status WHERE id = :id")
+                .param("status", status)
+                .param("id", id)
+                .update();
+    }
+
     public Optional<PurchaseOrderResponse> findById(long id) {
         Optional<HeaderRow> header = jdbc.sql(HEADER_SQL)
                 .param("id", id)

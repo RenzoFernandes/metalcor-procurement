@@ -1,6 +1,7 @@
 package com.metalcor.procurement.invoice;
 
 import com.metalcor.procurement.common.PageResponse;
+import com.metalcor.procurement.payment.PaymentRef;
 import com.metalcor.procurement.requisition.MaterialRef;
 import com.metalcor.procurement.requisition.SupplierRef;
 import com.metalcor.procurement.requisition.UserRef;
@@ -49,6 +50,12 @@ public class InvoiceRepository {
                AND vw.purchase_order_item_id = iri.purchase_order_item_id
              WHERE iri.invoice_receipt_id = :id
              ORDER BY iri.line_number
+            """;
+
+    private static final String PAYMENT_SQL = """
+            SELECT id, document_number, amount, scheduled_for, payment_method, status, paid_at
+              FROM payments
+             WHERE invoice_receipt_id = :id AND status <> 'cancelled'
             """;
 
     // Optional filters: a null parameter switches the condition off. All values are bound, never concatenated.
@@ -158,6 +165,49 @@ public class InvoiceRepository {
                 .update();
     }
 
+    /**
+     * Marks the invoice paid, leaving block_reason untouched (kept as history). approved_by/approved_at are set to
+     * the payer only if still null (a matched invoice paid without a prior /approve); an earlier approval is kept.
+     */
+    public void updatePaid(long invoiceId, long payerId) {
+        jdbc.sql("""
+                UPDATE invoice_receipts
+                   SET status = 'paid',
+                       approved_by = COALESCE(approved_by, :payerId),
+                       approved_at = COALESCE(approved_at, now())
+                 WHERE id = :id
+                """)
+                .param("payerId", payerId)
+                .param("id", invoiceId)
+                .update();
+    }
+
+    public void updateApproval(long invoiceId, long approvedBy, String notes) {
+        jdbc.sql("""
+                UPDATE invoice_receipts
+                   SET status = 'approved', approved_by = :approvedBy, approved_at = now(), notes = :notes
+                 WHERE id = :id
+                """)
+                .param("approvedBy", approvedBy)
+                .param("notes", notes, Types.VARCHAR)
+                .param("id", invoiceId)
+                .update();
+    }
+
+    /** Status, purchase order and billing fields needed to approve or pay an invoice. */
+    public Optional<InvoiceInfo> findInvoiceInfo(long invoiceId) {
+        return jdbc.sql("""
+                SELECT status, purchase_order_id, gross_amount, due_date
+                  FROM invoice_receipts
+                 WHERE id = :id
+                """)
+                .param("id", invoiceId)
+                .query((rs, rowNum) -> new InvoiceInfo(
+                        rs.getString("status"), rs.getLong("purchase_order_id"),
+                        rs.getBigDecimal("gross_amount"), rs.getObject("due_date", LocalDate.class)))
+                .optional();
+    }
+
     public Optional<InvoiceResponse> findById(long id) {
         Optional<HeaderRow> header = jdbc.sql(HEADER_SQL)
                 .param("id", id)
@@ -170,7 +220,12 @@ public class InvoiceRepository {
                 .param("id", id)
                 .query(InvoiceRepository::mapItem)
                 .list();
-        return Optional.of(header.get().toResponse(items));
+        PaymentRef payment = jdbc.sql(PAYMENT_SQL)
+                .param("id", id)
+                .query(InvoiceRepository::mapPayment)
+                .optional()
+                .orElse(null);
+        return Optional.of(header.get().toResponse(items, payment));
     }
 
     private static HeaderRow mapHeader(ResultSet rs, int rowNum) throws SQLException {
@@ -204,6 +259,17 @@ public class InvoiceRepository {
                 rs.getBoolean("quantity_exception"));
     }
 
+    private static PaymentRef mapPayment(ResultSet rs, int rowNum) throws SQLException {
+        return new PaymentRef(
+                rs.getLong("id"),
+                rs.getString("document_number"),
+                rs.getBigDecimal("amount"),
+                rs.getObject("scheduled_for", LocalDate.class),
+                rs.getString("payment_method"),
+                rs.getString("status"),
+                rs.getObject("paid_at", OffsetDateTime.class));
+    }
+
     /** Status, supplier and the supplier's payment terms of a purchase order. */
     public record OrderInfo(String status, long supplierId, int paymentTermsDays) {
     }
@@ -213,14 +279,19 @@ public class InvoiceRepository {
             BigDecimal priceTolerancePct, BigDecimal quantityTolerancePct) {
     }
 
+    /** Status, purchase order and billing fields of an invoice, needed to approve or pay it. */
+    public record InvoiceInfo(String status, long purchaseOrderId, BigDecimal grossAmount, LocalDate dueDate) {
+    }
+
     private record HeaderRow(
             long id, String documentNumber, String purchaseOrderNumber, SupplierRef supplier,
             String supplierInvoiceNumber, LocalDate invoiceDate, LocalDate dueDate, LocalDate postingDate,
             BigDecimal grossAmount, String status, String blockReason, UserRef approvedBy, OffsetDateTime approvedAt) {
 
-        InvoiceResponse toResponse(List<InvoiceItemResponse> items) {
+        InvoiceResponse toResponse(List<InvoiceItemResponse> items, PaymentRef payment) {
             return new InvoiceResponse(id, documentNumber, purchaseOrderNumber, supplier, supplierInvoiceNumber,
-                    invoiceDate, dueDate, postingDate, grossAmount, status, blockReason, approvedBy, approvedAt, items);
+                    invoiceDate, dueDate, postingDate, grossAmount, status, blockReason, approvedBy, approvedAt,
+                    items, payment);
         }
     }
 

@@ -1,5 +1,6 @@
 package com.metalcor.procurement.invoice;
 
+import com.metalcor.procurement.payment.PaymentRef;
 import com.metalcor.procurement.requisition.SupplierRef;
 import com.metalcor.procurement.requisition.UserRef;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -23,5 +24,6 @@ public record InvoiceResponse(
         @Schema(description = "Why the invoice is blocked. Only when status is blocked.") String blockReason,
         @Schema(description = "User who approved the invoice. Only when status is approved or paid.") UserRef approvedBy,
         OffsetDateTime approvedAt,
-        List<InvoiceItemResponse> items) {
+        List<InvoiceItemResponse> items,
+        @Schema(description = "Payment of this invoice, if any.") PaymentRef payment) {
 }

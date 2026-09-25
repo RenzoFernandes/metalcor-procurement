@@ -4,11 +4,17 @@ import com.metalcor.procurement.common.BadRequestException;
 import com.metalcor.procurement.common.ConflictException;
 import com.metalcor.procurement.common.ForbiddenException;
 import com.metalcor.procurement.common.NotFoundException;
+import com.metalcor.procurement.invoice.InvoiceRepository.InvoiceInfo;
 import com.metalcor.procurement.invoice.InvoiceRepository.LineMatch;
 import com.metalcor.procurement.invoice.InvoiceRepository.OrderInfo;
+import com.metalcor.procurement.order.PurchaseOrderRepository;
+import com.metalcor.procurement.payment.PaymentRepository;
+import com.metalcor.procurement.payment.PaymentRequest;
+import com.metalcor.procurement.payment.PaymentResponse;
 import com.metalcor.procurement.security.CurrentUser;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
+import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
@@ -22,13 +28,19 @@ import org.springframework.transaction.annotation.Transactional;
 public class InvoiceService {
 
     private static final Set<String> INVOICEABLE_STATUSES = Set.of("received", "partially_received");
+    private static final Set<String> PAYABLE_STATUSES = Set.of("matched", "approved");
 
     private final InvoiceRepository invoices;
+    private final PurchaseOrderRepository orders;
+    private final PaymentRepository payments;
     private final JdbcClient jdbc;
     private final CurrentUser currentUser;
 
-    public InvoiceService(InvoiceRepository invoices, JdbcClient jdbc, CurrentUser currentUser) {
+    public InvoiceService(InvoiceRepository invoices, PurchaseOrderRepository orders, PaymentRepository payments,
+            JdbcClient jdbc, CurrentUser currentUser) {
         this.invoices = invoices;
+        this.orders = orders;
+        this.payments = payments;
         this.jdbc = jdbc;
         this.currentUser = currentUser;
     }
@@ -93,6 +105,60 @@ public class InvoiceService {
     public InvoiceResponse get(long id) {
         return invoices.findById(id)
                 .orElseThrow(() -> new NotFoundException("Invoice " + id + " does not exist."));
+    }
+
+    @Transactional
+    public InvoiceResponse approve(long id, ApprovalRequest request) {
+        setAuditUser();
+
+        InvoiceInfo info = invoices.findInvoiceInfo(id)
+                .orElseThrow(() -> new NotFoundException("Invoice " + id + " does not exist."));
+        if (!"blocked".equals(info.status())) {
+            throw new ConflictException("Invoice " + id + " is " + info.status() + ", expected blocked.");
+        }
+        if (!"finance".equals(currentUser.role())) {
+            throw new ForbiddenException("Role finance is required to approve invoices.");
+        }
+
+        String notes = request != null ? request.notes() : null;
+        invoices.updateApproval(id, currentUser.id(), notes);
+
+        return invoices.findById(id).orElseThrow();
+    }
+
+    @Transactional
+    public PayInvoiceResponse pay(long id, PaymentRequest request) {
+        setAuditUser();
+
+        InvoiceInfo info = invoices.findInvoiceInfo(id)
+                .orElseThrow(() -> new NotFoundException("Invoice " + id + " does not exist."));
+        if (!PAYABLE_STATUSES.contains(info.status())) {
+            throw new ConflictException("Invoice " + id + " is " + info.status() + ", expected matched or approved.");
+        }
+        if (!"finance".equals(currentUser.role())) {
+            throw new ForbiddenException("Role finance is required to pay invoices.");
+        }
+
+        LocalDate scheduledFor = nextBusinessDay(info.dueDate());
+        long paymentId = payments.insert(id, info.grossAmount(), scheduledFor,
+                request.paymentMethod(), currentUser.id(), request.reference());
+
+        invoices.updatePaid(id, currentUser.id());
+        orders.updateStatus(info.purchaseOrderId(), "closed");
+
+        PaymentResponse payment = payments.findById(paymentId).orElseThrow();
+        return new PayInvoiceResponse(payment, "paid", "closed");
+    }
+
+    /** A due date on a weekend moves to the next Monday, same logic as vw_payment_timeliness. */
+    private static LocalDate nextBusinessDay(LocalDate date) {
+        if (date.getDayOfWeek() == DayOfWeek.SATURDAY) {
+            return date.plusDays(2);
+        }
+        if (date.getDayOfWeek() == DayOfWeek.SUNDAY) {
+            return date.plusDays(1);
+        }
+        return date;
     }
 
     /** Reads the three-way match outcome just inserted (vw_invoice_line_match) and sets status/block_reason from it. */

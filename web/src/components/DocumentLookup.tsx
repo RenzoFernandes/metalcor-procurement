@@ -112,6 +112,8 @@ export function DocumentLookup() {
 
       <IdForm label={t('lookup.requisitionById')} basePath="/requisitions" />
       <IdForm label={t('lookup.orderById')} basePath="/purchase-orders" />
+      <IdForm label={t('lookup.invoiceById')} basePath="/invoices" />
+      <IdForm label={t('lookup.paymentById')} basePath="/payments" />
 
       <p className="app-nav__note">{t('lookup.note')}</p>
     </div>

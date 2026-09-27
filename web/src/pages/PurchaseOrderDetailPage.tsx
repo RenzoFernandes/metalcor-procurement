@@ -1,18 +1,25 @@
+import { useState } from 'react'
 import { Navigate, useParams } from 'react-router-dom'
 import { getPurchaseOrder } from '../api/client'
+import type { GoodsReceipt, PurchaseOrder } from '../api/types'
 import { useApi } from '../api/useApi'
 import { ErrorNotice, LoadingNotice } from '../components/ErrorNotice'
 import { formatDate, formatMoney, formatNumber } from '../components/format'
+import { OrderInvoiceForm } from '../components/OrderInvoiceForm'
+import { OrderReceiptForm } from '../components/OrderReceiptForm'
 import { useTranslation } from '../i18n/I18nContext'
-import { useCurrentUser } from '../session/SessionContext'
+import { useCurrentUser, type CurrentUser } from '../session/SessionContext'
+
+const RECEIVABLE = ['issued', 'partially_received']
+const INVOICEABLE = ['received', 'partially_received']
 
 export function PurchaseOrderDetailPage() {
-  const { t, lang } = useTranslation()
+  const { t } = useTranslation()
   const { user } = useCurrentUser()
   const { id: idParam } = useParams()
   const id = Number(idParam)
 
-  const { data: order, error, loading } = useApi(
+  const { data: order, error, loading, setData } = useApi(
     () => (Number.isInteger(id) && id > 0 ? getPurchaseOrder(id) : Promise.reject(new Error('invalid id'))),
     id,
   )
@@ -28,6 +35,19 @@ export function PurchaseOrderDetailPage() {
     )
   }
 
+  return <OrderView key={order.id} order={order} user={user} onChange={setData} />
+}
+
+interface ViewProps {
+  order: PurchaseOrder
+  user: CurrentUser
+  onChange: (order: PurchaseOrder) => void
+}
+
+function OrderView({ order, user, onChange }: ViewProps) {
+  const { t, lang } = useTranslation()
+  const [receipt, setReceipt] = useState<GoodsReceipt | null>(null)
+
   return (
     <section>
       <div className="page-head">
@@ -36,6 +56,22 @@ export function PurchaseOrderDetailPage() {
         </h1>
         <span className={`status status--${order.status}`}>{t(`status.${order.status}`)}</span>
       </div>
+
+      {receipt && (
+        <div className="notice notice--success" role="status">
+          <p className="notice__title">{t('receipt.created', { number: receipt.documentNumber })}</p>
+          {receipt.deliveryNoteNumber && (
+            <p>{t('fields.deliveryNoteNumber')}: {receipt.deliveryNoteNumber}</p>
+          )}
+          <ul className="notice__list">
+            {receipt.items.map((item) => (
+              <li key={item.material.id}>
+                {item.material.code} – {item.material.description}: {formatNumber(item.quantityReceived, lang)}
+              </li>
+            ))}
+          </ul>
+        </div>
+      )}
 
       <div className="card">
         <dl className="facts">
@@ -83,6 +119,19 @@ export function PurchaseOrderDetailPage() {
           </table>
         </div>
       </div>
+
+      {RECEIVABLE.includes(order.status) && (
+        <OrderReceiptForm
+          order={order}
+          user={user}
+          onReceived={(result) => {
+            setReceipt(result.goodsReceipt)
+            onChange({ ...order, status: result.purchaseOrderStatus })
+          }}
+        />
+      )}
+
+      {INVOICEABLE.includes(order.status) && <OrderInvoiceForm order={order} user={user} />}
     </section>
   )
 }

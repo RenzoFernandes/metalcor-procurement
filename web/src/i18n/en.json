@@ -33,6 +33,8 @@
     "order": "Purchase order",
     "requisitionById": "View requisition by ID",
     "orderById": "View order by ID",
+    "invoiceById": "View invoice by ID",
+    "paymentById": "View payment by ID",
     "invalidId": "Enter digits only (the numeric ID).",
     "textNotSupported": "Searching by text number (e.g. PR-2026-000973) is not possible yet: the API has no such endpoint. Use the numeric ID.",
     "note": "Temporary limitation: lookup works by numeric ID only."
@@ -65,7 +67,22 @@
     "unitOfMeasureId": "Unit",
     "estimatedUnitPrice": "Estimated unit price",
     "decision": "Decision",
-    "comment": "Comment"
+    "comment": "Comment",
+    "deliveryNoteNumber": "Delivery note",
+    "supplierInvoiceNumber": "Supplier invoice number",
+    "invoiceDate": "Invoice date",
+    "dueDate": "Due date",
+    "paymentMethod": "Payment method",
+    "reference": "Reference",
+    "quantityReceived": "Quantity received",
+    "quantityInvoiced": "Quantity invoiced",
+    "unitPrice": "Unit price",
+    "purchaseOrderItemId": "Order item"
+  },
+  "paymentMethod": {
+    "bank_transfer": "Bank transfer",
+    "boleto": "Boleto",
+    "pix": "Pix"
   },
   "status": {
     "draft": "Draft",
@@ -76,7 +93,11 @@
     "closed": "Closed",
     "issued": "Issued",
     "partially_received": "Partially received",
-    "received": "Received"
+    "received": "Received",
+    "matched": "Matched",
+    "blocked": "Blocked",
+    "paid": "Paid",
+    "scheduled": "Scheduled"
   },
   "requisition": {
     "total": "Total",
@@ -128,6 +149,67 @@
     "days": "{count} days",
     "unitPrice": "Unit price"
   },
+  "receipt": {
+    "created": "Goods receipt {number} registered.",
+    "form": {
+      "title": "Register goods receipt",
+      "help": "Enter the quantity received for each item. Items with an empty or zero quantity are ignored.",
+      "ordered": "Ordered",
+      "remaining": "Still to receive",
+      "toReceive": "To receive",
+      "submit": "Register receipt",
+      "invalidQuantity": "Use numeric quantities, no negative values.",
+      "noItems": "Enter the quantity of at least one item."
+    }
+  },
+  "invoice": {
+    "title": "Invoice",
+    "form": {
+      "title": "Register invoice",
+      "help": "Values start equal to the order and can be edited. Items with an empty or zero quantity are left out.",
+      "financeOnly": "Only the Finance role registers invoices; the API refuses other roles.",
+      "dueHelp": "Without a due date, the API uses the invoice date plus the supplier's payment terms.",
+      "dueBeforeInvoice": "cannot be before the invoice date",
+      "invalidLine": "enter a valid quantity and price (price greater than zero)",
+      "noItems": "Enter the quantity of at least one item.",
+      "quantityInvoiced": "Qty invoiced",
+      "unitPriceInvoiced": "Unit price invoiced",
+      "created": "Invoice {number} registered.",
+      "open": "Open invoice",
+      "submit": "Register invoice"
+    },
+    "detail": {
+      "approvedNotice": "Invoice approved.",
+      "paidNotice": "Payment {number} registered.",
+      "blocked": "Invoice blocked by the three-way match",
+      "order": "Source order",
+      "postingDate": "Posting date",
+      "grossAmount": "Gross amount",
+      "payment": "Payment",
+      "linkLimitation": "Temporary limitation: the API returns only the order number, not its ID, so the source order is not a link.",
+      "exceptions": "Match check",
+      "priceException": "Price outside tolerance",
+      "quantityException": "Quantity outside tolerance",
+      "noException": "OK",
+      "alreadyPaid": "This invoice has already been paid.",
+      "approveTitle": "Approve blocked invoice",
+      "approveHelp": "Approves despite the three-way match exception. The justification is optional.",
+      "approveButton": "Approve",
+      "payTitle": "Register payment",
+      "payHelp": "Creates the payment and marks the invoice as paid.",
+      "payButton": "Register payment",
+      "financeOnly": "Only the Finance role can do this; the API refuses other roles."
+    }
+  },
+  "payment": {
+    "title": "Payment",
+    "invoice": "Source invoice",
+    "amount": "Amount",
+    "scheduledFor": "Scheduled date",
+    "paidAt": "Payment date",
+    "createdBy": "Registered by",
+    "linkLimitation": "Temporary limitation: the API returns only the invoice number, not its ID, so the source invoice is not a link."
+  },
   "errors": {
     "line": "Item {n}",
     "unexpected": "Something went wrong. Please try again.",
@@ -144,7 +226,9 @@
       "positive": "must be greater than zero",
       "minItems": "include at least one item",
       "maxItems": "at most 8 items",
-      "decision": "choose approve or reject"
+      "decision": "choose approve or reject",
+      "paymentMethod": "choose bank transfer, boleto or pix",
+      "max60": "at most 60 characters"
     }
   }
 }

@@ -33,6 +33,8 @@
     "order": "Pedido",
     "requisitionById": "Ver requisição por ID",
     "orderById": "Ver pedido por ID",
+    "invoiceById": "Ver fatura por ID",
+    "paymentById": "Ver pagamento por ID",
     "invalidId": "Digite só números (o ID numérico).",
     "textNotSupported": "Ainda não é possível buscar por número textual (ex.: PR-2026-000973): a API não tem esse endpoint. Use o ID numérico.",
     "note": "Limitação provisória: a busca funciona só pelo ID numérico."
@@ -65,7 +67,22 @@
     "unitOfMeasureId": "Unidade",
     "estimatedUnitPrice": "Preço estimado (unitário)",
     "decision": "Decisão",
-    "comment": "Comentário"
+    "comment": "Comentário",
+    "deliveryNoteNumber": "Nota de remessa",
+    "supplierInvoiceNumber": "Número da nota do fornecedor",
+    "invoiceDate": "Data da fatura",
+    "dueDate": "Vencimento",
+    "paymentMethod": "Método de pagamento",
+    "reference": "Referência",
+    "quantityReceived": "Quantidade recebida",
+    "quantityInvoiced": "Quantidade faturada",
+    "unitPrice": "Preço unitário",
+    "purchaseOrderItemId": "Item do pedido"
+  },
+  "paymentMethod": {
+    "bank_transfer": "Transferência bancária",
+    "boleto": "Boleto",
+    "pix": "Pix"
   },
   "status": {
     "draft": "Rascunho",
@@ -76,7 +93,11 @@
     "closed": "Encerrado",
     "issued": "Emitido",
     "partially_received": "Recebido parcialmente",
-    "received": "Recebido"
+    "received": "Recebido",
+    "matched": "Conferida",
+    "blocked": "Bloqueada",
+    "paid": "Paga",
+    "scheduled": "Agendado"
   },
   "requisition": {
     "total": "Total",
@@ -128,6 +149,67 @@
     "days": "{count} dias",
     "unitPrice": "Preço unitário"
   },
+  "receipt": {
+    "created": "Recebimento {number} registrado.",
+    "form": {
+      "title": "Registrar recebimento",
+      "help": "Informe a quantidade recebida de cada item. Itens com quantidade vazia ou zero são ignorados.",
+      "ordered": "Pedido",
+      "remaining": "Falta receber",
+      "toReceive": "A receber",
+      "submit": "Registrar recebimento",
+      "invalidQuantity": "Use quantidades numéricas, sem valores negativos.",
+      "noItems": "Informe a quantidade de pelo menos um item."
+    }
+  },
+  "invoice": {
+    "title": "Fatura",
+    "form": {
+      "title": "Registrar fatura",
+      "help": "Os valores começam iguais aos do pedido e podem ser editados. Itens com quantidade vazia ou zero ficam de fora.",
+      "financeOnly": "Somente o perfil Financeiro registra faturas; a API recusa outros perfis.",
+      "dueHelp": "Sem vencimento, a API usa a data da fatura mais o prazo de pagamento do fornecedor.",
+      "dueBeforeInvoice": "não pode ser anterior à data da fatura",
+      "invalidLine": "informe quantidade e preço válidos (preço maior que zero)",
+      "noItems": "Informe a quantidade de pelo menos um item.",
+      "quantityInvoiced": "Qtd. faturada",
+      "unitPriceInvoiced": "Preço unit. faturado",
+      "created": "Fatura {number} registrada.",
+      "open": "Abrir fatura",
+      "submit": "Registrar fatura"
+    },
+    "detail": {
+      "approvedNotice": "Fatura aprovada.",
+      "paidNotice": "Pagamento {number} registrado.",
+      "blocked": "Fatura bloqueada pelo three-way match",
+      "order": "Pedido de origem",
+      "postingDate": "Data de lançamento",
+      "grossAmount": "Valor bruto",
+      "payment": "Pagamento",
+      "linkLimitation": "Limitação provisória: a API devolve só o número do pedido, sem o ID, então o pedido de origem não vira link.",
+      "exceptions": "Conferência",
+      "priceException": "Preço fora da tolerância",
+      "quantityException": "Quantidade fora da tolerância",
+      "noException": "OK",
+      "alreadyPaid": "Esta fatura já foi paga.",
+      "approveTitle": "Aprovar fatura bloqueada",
+      "approveHelp": "Aprova apesar da exceção do three-way match. A justificativa é opcional.",
+      "approveButton": "Aprovar",
+      "payTitle": "Registrar pagamento",
+      "payHelp": "Gera o pagamento e marca a fatura como paga.",
+      "payButton": "Registrar pagamento",
+      "financeOnly": "Somente o perfil Financeiro faz esta ação; a API recusa outros perfis."
+    }
+  },
+  "payment": {
+    "title": "Pagamento",
+    "invoice": "Fatura de origem",
+    "amount": "Valor",
+    "scheduledFor": "Data agendada",
+    "paidAt": "Data do pagamento",
+    "createdBy": "Registrado por",
+    "linkLimitation": "Limitação provisória: a API devolve só o número da fatura, sem o ID, então a fatura de origem não vira link."
+  },
   "errors": {
     "line": "Item {n}",
     "unexpected": "Algo deu errado. Tente novamente.",
@@ -144,7 +226,9 @@
       "positive": "deve ser maior que zero",
       "minItems": "inclua pelo menos um item",
       "maxItems": "no máximo 8 itens",
-      "decision": "escolha aprovar ou rejeitar"
+      "decision": "escolha aprovar ou rejeitar",
+      "paymentMethod": "escolha transferência bancária, boleto ou pix",
+      "max60": "no máximo 60 caracteres"
     }
   }
 }

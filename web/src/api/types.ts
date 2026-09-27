@@ -145,7 +145,8 @@ export interface InvoiceItemRequest {
 export interface InvoiceRequest {
   supplierInvoiceNumber: string
   invoiceDate: string
-  dueDate: string
+  /** Optional: the API defaults it to invoiceDate plus the supplier's payment terms. */
+  dueDate?: string | null
   items: InvoiceItemRequest[]
 }
 
@@ -203,6 +204,8 @@ export interface Payment {
   amount: number
   scheduledFor: string
   paymentMethod: string
+  /** scheduled, paid or cancelled */
+  status: string
   paidAt: string | null
   createdBy: UserRef
   reference: string | null

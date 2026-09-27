@@ -286,9 +286,9 @@ p { margin: 0 0 var(--space-3); }
   background: var(--color-accent-soft);
   color: var(--color-primary);
 }
-.status--approved, .status--issued, .status--received, .status--closed { background: #dff3e4; color: #1d5c2e; }
-.status--pending_approval, .status--partially_received { background: #fdf0d2; color: #7a5200; }
-.status--rejected, .status--cancelled { background: #f9dcdc; color: #8a1f1f; }
+.status--approved, .status--issued, .status--received, .status--closed, .status--matched, .status--paid { background: #dff3e4; color: #1d5c2e; }
+.status--pending_approval, .status--partially_received, .status--scheduled { background: #fdf0d2; color: #7a5200; }
+.status--rejected, .status--cancelled, .status--blocked { background: #f9dcdc; color: #8a1f1f; }
 
 .notice { padding: var(--space-2) var(--space-3); border-radius: var(--radius); border: 1px solid var(--color-border); background: var(--color-surface); }
 .notice__title { margin: 0; font-weight: 600; }
@@ -307,6 +307,20 @@ p { margin: 0 0 var(--space-3); }
 .table th, .table td { padding: var(--space-2); border-bottom: 1px solid var(--color-border); text-align: left; vertical-align: top; }
 .table thead th { font-size: 0.8125rem; color: var(--color-muted); }
 .table .num { text-align: right; white-space: nowrap; }
+
+.table input {
+  width: 8rem;
+  font: inherit;
+  text-align: right;
+  padding: 0.25rem 0.5rem;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius);
+}
+.row--exception { background: #fdf6f6; }
+.cell--exception { color: #8a1f1f; font-weight: 600; }
+.flag { display: inline-block; margin-right: var(--space-2); font-size: 0.8125rem; font-weight: 600; }
+.flag--exception { color: #8a1f1f; }
+.flag--ok { color: #1d5c2e; }
 
 .link-list { margin: 0 0 var(--space-2); padding-left: 1.25rem; }
 .radio-row { display: flex; gap: var(--space-4); margin-bottom: var(--space-3); }

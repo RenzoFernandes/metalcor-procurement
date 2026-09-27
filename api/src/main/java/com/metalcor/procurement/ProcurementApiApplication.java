@@ -10,3 +10,4 @@ public class ProcurementApiApplication {
         SpringApplication.run(ProcurementApiApplication.class, args);
     }
 }
+

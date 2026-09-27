@@ -17,6 +17,8 @@ const VALIDATION_MESSAGES: Record<string, string> = {
   'must contain at least one item': 'errors.validation.minItems',
   'must contain at most 8 items': 'errors.validation.maxItems',
   'must be approve or reject': 'errors.validation.decision',
+  'must be bank_transfer, boleto or pix': 'errors.validation.paymentMethod',
+  'must be at most 60 characters': 'errors.validation.max60',
 }
 
 const KNOWN_FIELDS = new Set([
@@ -31,6 +33,16 @@ const KNOWN_FIELDS = new Set([
   'estimatedUnitPrice',
   'decision',
   'comment',
+  'deliveryNoteNumber',
+  'purchaseOrderItemId',
+  'quantityReceived',
+  'supplierInvoiceNumber',
+  'invoiceDate',
+  'dueDate',
+  'quantityInvoiced',
+  'unitPrice',
+  'paymentMethod',
+  'reference',
 ])
 
 function fieldLabel(field: string, t: Translate): string {

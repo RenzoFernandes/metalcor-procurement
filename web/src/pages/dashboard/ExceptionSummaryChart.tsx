@@ -38,8 +38,8 @@ export function ExceptionSummaryChart({ rows, sql }: { rows: ExceptionSummary[];
       description={t('dashboard.charts.exceptionSummary.description')}
       sql={sql}
     >
-      <ResponsiveContainer width="100%" height={300}>
-        <BarChart data={data} margin={{ top: 8, right: 8, left: 0, bottom: 0 }}>
+      <ResponsiveContainer width="100%" height={320}>
+        <BarChart data={data} margin={{ top: 8, right: 16, left: 0, bottom: 0 }}>
           <CartesianGrid strokeDasharray="3 3" stroke={GRIDLINE} vertical={false} />
           <XAxis dataKey="typeLabel" tick={{ fill: AXIS_TEXT, fontSize: 12 }} axisLine={{ stroke: GRIDLINE }} tickLine={false} />
           <YAxis tick={{ fill: AXIS_TEXT, fontSize: 12 }} axisLine={false} tickLine={false} allowDecimals={false} width={40} />
@@ -66,7 +66,7 @@ export function ExceptionSummaryChart({ rows, sql }: { rows: ExceptionSummary[];
               )
             }}
           />
-          <Legend wrapperStyle={{ fontSize: 12 }} />
+          <Legend wrapperStyle={{ fontSize: 12, paddingTop: 8 }} />
           {/* Blue x aqua, not red x green: colorblind users must not rely on a red/green cue here. */}
           <Bar dataKey="open" name={t('dashboard.resolution.open')} fill={CATEGORY_COLORS[0]} radius={[4, 4, 0, 0]} />
           <Bar dataKey="released" name={t('dashboard.resolution.released')} fill={CATEGORY_COLORS[2]} radius={[4, 4, 0, 0]} />

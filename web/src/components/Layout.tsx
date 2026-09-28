@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { NavLink, Outlet, useNavigate } from 'react-router-dom'
+import { NavLink, Outlet, useLocation, useNavigate } from 'react-router-dom'
 import { useTranslation } from '../i18n/I18nContext'
 import { CHANGE_EVENT, loadRecentRequisitions, type RecentRequisition } from '../session/recentRequisitions'
 import { useCurrentUser } from '../session/SessionContext'
@@ -47,6 +47,8 @@ export function Layout() {
   const { t } = useTranslation()
   const { user, setUser } = useCurrentUser()
   const navigate = useNavigate()
+  const location = useLocation()
+  const isDashboard = location.pathname.startsWith('/dashboard')
 
   function switchUser() {
     setUser(null)
@@ -101,7 +103,7 @@ export function Layout() {
             <DocumentLookup />
           </nav>
         )}
-        <main className="app-main">
+        <main className={isDashboard ? 'app-main app-main--wide' : 'app-main'}>
           <Outlet />
         </main>
       </div>

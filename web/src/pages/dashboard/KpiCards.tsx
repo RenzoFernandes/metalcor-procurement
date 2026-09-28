@@ -8,14 +8,26 @@ export function KpiCards({ kpis }: { kpis: DashboardKpis }) {
   const { t, lang } = useTranslation()
 
   const cards: { label: string; value: string; sql: string }[] = [
-    { label: t('dashboard.kpis.totalSpend'), value: formatMoney(kpis.totalSpend.data, lang), sql: kpis.totalSpend.sql },
-    { label: t('dashboard.kpis.orders'), value: formatCount(kpis.orders.data, lang), sql: kpis.orders.sql },
+    {
+      label: t('dashboard.kpis.totalSpend'),
+      value: formatMoney(kpis.totalSpend.data, lang),
+      sql: kpis.totalSpend.sql,
+    },
+    {
+      label: t('dashboard.kpis.orders'),
+      value: formatCount(kpis.orders.data, lang),
+      sql: kpis.orders.sql,
+    },
     {
       label: t('dashboard.kpis.openExceptionInvoices'),
       value: formatCount(kpis.openExceptionInvoices.data, lang),
       sql: kpis.openExceptionInvoices.sql,
     },
-    { label: t('dashboard.kpis.blockedAmount'), value: formatMoney(kpis.blockedAmount.data, lang), sql: kpis.blockedAmount.sql },
+    {
+      label: t('dashboard.kpis.blockedAmount'),
+      value: formatMoney(kpis.blockedAmount.data, lang),
+      sql: kpis.blockedAmount.sql,
+    },
     {
       label: t('dashboard.kpis.onTimeDelivery'),
       value: formatPercent(kpis.overallOnTimeDeliveryPct.data, lang),

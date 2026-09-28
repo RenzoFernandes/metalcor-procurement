@@ -36,9 +36,16 @@ export function SpendByMonthChart({ rows, sql }: { rows: SpendByMonthCategory[];
   return (
     <ChartCard title={t('dashboard.charts.spendByMonth.title')} description={t('dashboard.charts.spendByMonth.description')} sql={sql}>
       <ResponsiveContainer width="100%" height={320}>
-        <BarChart data={data} margin={{ top: 8, right: 8, left: 0, bottom: 0 }}>
+        <BarChart data={data} margin={{ top: 8, right: 16, left: 0, bottom: 0 }}>
           <CartesianGrid strokeDasharray="3 3" stroke={GRIDLINE} vertical={false} />
-          <XAxis dataKey="monthLabel" tick={{ fill: AXIS_TEXT, fontSize: 12 }} axisLine={{ stroke: GRIDLINE }} tickLine={false} />
+          <XAxis
+            dataKey="monthLabel"
+            tick={{ fill: AXIS_TEXT, fontSize: 12 }}
+            axisLine={{ stroke: GRIDLINE }}
+            tickLine={false}
+            interval="preserveStartEnd"
+            minTickGap={8}
+          />
           <YAxis
             tick={{ fill: AXIS_TEXT, fontSize: 12 }}
             axisLine={false}
@@ -76,7 +83,10 @@ export function SpendByMonthChart({ rows, sql }: { rows: SpendByMonthCategory[];
               )
             }}
           />
-          <Legend formatter={(value: string) => categoryNames.get(value) ?? value} wrapperStyle={{ fontSize: 12 }} />
+          <Legend
+            formatter={(value: string) => categoryNames.get(value) ?? value}
+            wrapperStyle={{ fontSize: 12, paddingTop: 8 }}
+          />
           {categoriesPresent.map((code, i) => (
             <Bar key={code} dataKey={code} stackId="spend" fill={CATEGORY_COLORS[i % CATEGORY_COLORS.length]} radius={0} />
           ))}

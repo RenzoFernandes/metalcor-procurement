@@ -14,8 +14,15 @@ export function StaleInvoicesTable({ rows, sql }: { rows: StaleInvoice[]; sql: s
       {rows.length === 0 ? (
         <p className="muted">{t('dashboard.staleInvoices.empty')}</p>
       ) : (
-        <div className="table-wrap">
-          <table className="table">
+        <div className="table-wrap table-wrap--stale">
+          <table className="table table--stale">
+            <colgroup>
+              <col style={{ width: '16%' }} />
+              <col style={{ width: '16%' }} />
+              <col style={{ width: '10%' }} />
+              <col style={{ width: '16%' }} />
+              <col style={{ width: '42%' }} />
+            </colgroup>
             <thead>
               <tr>
                 <th>{t('dashboard.staleInvoices.number')}</th>
@@ -26,15 +33,25 @@ export function StaleInvoicesTable({ rows, sql }: { rows: StaleInvoice[]; sql: s
               </tr>
             </thead>
             <tbody>
-              {rows.map((inv) => (
-                <tr key={inv.invoiceNumber} className={inv.ageBand === '90+' ? 'row--stale' : undefined}>
-                  <td>{inv.invoiceNumber}</td>
-                  <td className="num">{formatMoney(inv.amount, lang)}</td>
-                  <td className="num">{inv.ageDays}</td>
-                  <td>{t(`dashboard.ageBand.${inv.ageBand}`)}</td>
-                  <td>{inv.blockReason ?? '—'}</td>
-                </tr>
-              ))}
+              {rows.map((inv) => {
+                const isStale = inv.ageBand === '90+'
+                return (
+                  <tr key={inv.invoiceNumber} className={isStale ? 'row--stale' : undefined}>
+                    <td>
+                      {isStale && (
+                        <span className="row--stale__icon" aria-hidden="true" title={t('dashboard.ageBand.90+')}>
+                          ⚠
+                        </span>
+                      )}
+                      {inv.invoiceNumber}
+                    </td>
+                    <td className="num">{formatMoney(inv.amount, lang)}</td>
+                    <td className="num">{inv.ageDays}</td>
+                    <td>{t(`dashboard.ageBand.${inv.ageBand}`)}</td>
+                    <td className="cell--wrap">{inv.blockReason ?? '—'}</td>
+                  </tr>
+                )
+              })}
             </tbody>
           </table>
         </div>

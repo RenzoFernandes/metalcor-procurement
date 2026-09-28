@@ -121,6 +121,10 @@ p { margin: 0 0 var(--space-3); }
   max-width: 64rem;
 }
 
+.app-main--wide {
+  max-width: 90rem;
+}
+
 .app-footer {
   padding: var(--space-3) var(--space-4);
   font-size: 0.8125rem;
@@ -404,31 +408,59 @@ p { margin: 0 0 var(--space-3); }
 /* ---------- Dashboard ---------- */
 .kpi-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(11rem, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(15rem, 1fr));
   gap: var(--space-3);
-  margin-bottom: var(--space-3);
+  margin-bottom: var(--space-4);
 }
-.kpi-card { display: flex; flex-direction: column; gap: var(--space-1); }
-.kpi-card__label { margin: 0; font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.04em; color: var(--color-muted); }
-.kpi-card__value { margin: 0; font-size: 1.5rem; font-weight: 700; color: var(--color-primary); }
+.kpi-card {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+  min-width: 15rem;
+  container-type: inline-size;
+}
+.kpi-card__label {
+  margin: 0;
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--color-muted);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.kpi-card__value {
+  margin: 0;
+  font-size: clamp(0.85rem, 7cqw, 1.375rem);
+  font-weight: 700;
+  color: var(--color-primary);
+  white-space: nowrap;
+}
 
 .dashboard-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(24rem, 1fr));
-  gap: var(--space-3);
-  align-items: start;
-  margin-bottom: var(--space-3);
+  grid-template-columns: 1fr;
+  gap: var(--space-4);
+  align-items: stretch;
+  margin-bottom: var(--space-4);
 }
 
+@media (min-width: 1200px) {
+  .dashboard-grid { grid-template-columns: 1fr 1fr; }
+}
+
+.dashboard-grid__full { grid-column: 1 / -1; }
+.dashboard-grid__full > * { height: 100%; }
+
+.chart-card {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  min-width: 0;
+}
 .chart-card__description { margin-bottom: var(--space-2); }
-.chart-card__body { width: 100%; }
+.chart-card__body { width: 100%; min-width: 0; flex: 1; }
 .chart-card__axis-title { margin: 0 0 var(--space-1); text-transform: uppercase; letter-spacing: 0.04em; font-size: 0.6875rem; }
-
-.late-payments__grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(14rem, 1fr));
-  gap: var(--space-3);
-}
 
 .chart-tooltip {
   background: var(--color-surface);
@@ -442,5 +474,18 @@ p { margin: 0 0 var(--space-3); }
 .chart-tooltip__row { margin: 0; display: flex; align-items: center; gap: var(--space-1); flex-wrap: wrap; }
 .chart-tooltip__swatch { display: inline-block; width: 0.625rem; height: 0.625rem; border-radius: 2px; flex-shrink: 0; }
 
-.row--stale { background: #fbeaea; }
+/* ---------- Stale invoices table ---------- */
+.table--stale { table-layout: fixed; }
+.table-wrap--stale { max-height: 22rem; overflow-y: auto; }
+.table-wrap--stale thead th {
+  position: sticky;
+  top: 0;
+  background: var(--color-surface);
+  z-index: 1;
+  box-shadow: 0 1px 0 var(--color-border);
+}
+.cell--wrap { white-space: normal; word-break: break-word; }
+
+.row--stale { background: #fbf3e6; }
 .row--stale td:first-child { font-weight: 600; }
+.row--stale__icon { margin-right: var(--space-1); color: #a05a00; }

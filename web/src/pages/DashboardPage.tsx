@@ -56,15 +56,19 @@ export function DashboardPage() {
           {exceptionSummary.data && <ExceptionSummaryChart rows={exceptionSummary.data.data} sql={exceptionSummary.data.sql} />}
         </Section>
 
-        <Section loading={latePayments.loading} error={latePayments.error}>
-          {latePayments.data && <LatePaymentsPanel rows={latePayments.data.data} sql={latePayments.data.sql} />}
-        </Section>
+        <div className="dashboard-grid__full">
+          <Section loading={latePayments.loading} error={latePayments.error}>
+            {latePayments.data && <LatePaymentsPanel rows={latePayments.data.data} sql={latePayments.data.sql} />}
+          </Section>
+        </div>
 
-        <Section loading={supplierScorecard.loading} error={supplierScorecard.error}>
-          {supplierScorecard.data && (
-            <SupplierScorecardChart rows={supplierScorecard.data.data} sql={supplierScorecard.data.sql} />
-          )}
-        </Section>
+        <div className="dashboard-grid__full">
+          <Section loading={supplierScorecard.loading} error={supplierScorecard.error}>
+            {supplierScorecard.data && (
+              <SupplierScorecardChart rows={supplierScorecard.data.data} sql={supplierScorecard.data.sql} />
+            )}
+          </Section>
+        </div>
       </div>
 
       <Section loading={staleInvoices.loading} error={staleInvoices.error}>

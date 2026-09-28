@@ -10,11 +10,12 @@ import org.springframework.transaction.annotation.Transactional;
 public class SupplierRepository {
 
     // The view already orders by total spend, then supplier code.
-    private static final String SCORECARD_SQL = """
+    // Public so the dashboard package can report the exact SQL alongside the same data, with no separate copy to drift.
+    public static final String SCORECARD_SQL = """
             SELECT supplier_code, supplier_name, orders, total_spend, on_time_delivery_pct, avg_days_late,
                    invoices, exception_rate_pct, avg_days_to_resolve, open_exceptions
               FROM vw_supplier_scorecard
-            """;
+            """.strip();
 
     private final JdbcClient jdbc;
 

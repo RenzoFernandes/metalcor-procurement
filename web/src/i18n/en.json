@@ -14,7 +14,8 @@
   "header": {
     "currentUser": "Current user",
     "switchUser": "Switch user",
-    "language": "Language"
+    "language": "Language",
+    "technicalMode": "Technical mode"
   },
   "nav": {
     "label": "Navigation",
@@ -22,7 +23,14 @@
     "newRequisition": "New requisition",
     "recent": "Recent requisitions",
     "recentEmpty": "No requisitions created in this session.",
-    "recentNote": "Only requisitions created in this browser session appear here (the API has no listing yet)."
+    "recentNote": "Only requisitions created in this browser session appear here (the API has no listing yet).",
+    "dashboard": "Dashboard",
+    "dashboardNotice": "The dashboard is aimed at management (manager, finance and approver), but the read-only data is open to every role."
+  },
+  "technical": {
+    "sql": "SQL",
+    "copy": "Copy",
+    "copied": "Copied!"
   },
   "lookup": {
     "title": "Find document",
@@ -53,8 +61,16 @@
   "home": {
     "welcome": "Welcome, {name}",
     "roleLine": "You are signed in as {role}.",
-    "scriptTitle": "Test script",
-    "scriptPlaceholder": "The three-task test script to walk through the procurement flow will go here. The tasks will be defined in upcoming versions."
+    "tasksTitle": "Test script",
+    "tasksIntro": "Three tasks to walk through the procurement flow, from requisition to payment.",
+    "task1Title": "1. Create a requisition",
+    "task1Text": "Sign in as Requester and create a purchase requisition with one or more items.",
+    "task1Link": "New requisition",
+    "task2Title": "2. Approve and issue the order",
+    "task2Text": "Sign in as Buyer (or Approver, depending on the amount-based rule). Use \"Find document\", in the sidebar, with the requisition number from step 1 to open it, approve it and issue the purchase order.",
+    "task3Title": "3. Receive, invoice, pay and see the SQL",
+    "task3Text": "Sign in as Finance, open the order through document lookup, and register the goods receipt, the invoice and the payment. Then open the Dashboard with technical mode on to see the SQL behind each number.",
+    "task3Link": "Open the Dashboard"
   },
   "fields": {
     "plantId": "Plant",
@@ -209,6 +225,74 @@
     "paidAt": "Payment date",
     "createdBy": "Registered by",
     "linkLimitation": "Temporary limitation: the API returns only the invoice number, not its ID, so the source invoice is not a link."
+  },
+  "dashboard": {
+    "title": "Manager dashboard",
+    "intro": "Numbers and charts for the procurement flow. Turn on technical mode, in the header, to see the SQL behind each one.",
+    "kpis": {
+      "totalSpend": "Total spend",
+      "orders": "Orders",
+      "openExceptionInvoices": "Invoices with an open exception",
+      "blockedAmount": "Blocked amount",
+      "onTimeDelivery": "On-time delivery"
+    },
+    "charts": {
+      "spendByMonth": {
+        "title": "Spend by month",
+        "description": "Total order value per month, stacked by material category."
+      },
+      "exceptionSummary": {
+        "title": "Exceptions by type",
+        "description": "Invoices with a three-way match exception, open x released."
+      },
+      "latePayments": {
+        "title": "Late payments by month",
+        "description": "Total late payments and average days late of the late ones."
+      },
+      "supplierScorecard": {
+        "title": "Supplier ranking",
+        "description": "On-time delivery rate and invoice exception rate, ordered by total spend."
+      }
+    },
+    "staleInvoices": {
+      "title": "Stale invoices",
+      "description": "Invoices blocked for more than 45 days by a three-way match exception.",
+      "number": "Number",
+      "amount": "Amount",
+      "age": "Age (days)",
+      "ageBand": "Age band",
+      "reason": "Reason",
+      "empty": "No stale invoices right now."
+    },
+    "exceptionType": {
+      "price_variance": "Price",
+      "quantity_variance": "Quantity",
+      "invoice_before_receipt": "Invoice before receipt"
+    },
+    "resolution": {
+      "open": "Open",
+      "released": "Released",
+      "cancelled": "Cancelled"
+    },
+    "ageBand": {
+      "0-15": "0-15 days",
+      "16-30": "16-30 days",
+      "31-45": "31-45 days",
+      "46-90": "46-90 days",
+      "90+": "Over 90 days"
+    },
+    "axis": {
+      "totalDelayed": "Late payments",
+      "avgDaysLate": "Average days late",
+      "onTimePct": "On-time (%)",
+      "exceptionRatePct": "Exception rate (%)"
+    },
+    "tooltip": {
+      "orders": "orders",
+      "items": "items",
+      "suppliers": "suppliers",
+      "invoices": "invoices"
+    }
   },
   "errors": {
     "line": "Item {n}",

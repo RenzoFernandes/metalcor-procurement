@@ -2,13 +2,17 @@ import type {
   ApprovalRequest,
   CreateReceiptResponse,
   CreateRequisitionRequest,
+  DashboardKpis,
+  DashboardResult,
   DecisionRequest,
+  ExceptionSummary,
   GoodsReceipt,
   Invoice,
   InvoiceException,
   InvoiceExceptionsQuery,
   InvoiceRequest,
   IssueOrderResponse,
+  LatePaymentsByMonth,
   PageResponse,
   PayInvoiceResponse,
   Payment,
@@ -16,6 +20,8 @@ import type {
   PurchaseOrder,
   ReceiptRequest,
   Requisition,
+  SpendByMonthCategory,
+  StaleInvoice,
   SupplierScorecard,
 } from './types'
 
@@ -149,3 +155,22 @@ export const payInvoice = (userId: number, id: number, body: PaymentRequest) =>
   request<PayInvoiceResponse>(`/invoices/${id}/pay`, { method: 'POST', body, userId })
 
 export const getPayment = (id: number) => request<Payment>(`/payments/${id}`)
+
+// Dashboard (manager panel)
+
+export const getDashboardKpis = () => request<DashboardKpis>('/dashboard/kpis')
+
+export const getDashboardSpendByMonth = () =>
+  request<DashboardResult<SpendByMonthCategory[]>>('/dashboard/spend-by-month')
+
+export const getDashboardExceptionSummary = () =>
+  request<DashboardResult<ExceptionSummary[]>>('/dashboard/exception-summary')
+
+export const getDashboardLatePayments = () =>
+  request<DashboardResult<LatePaymentsByMonth[]>>('/dashboard/late-payments')
+
+export const getDashboardStaleInvoices = () =>
+  request<DashboardResult<StaleInvoice[]>>('/dashboard/stale-invoices')
+
+export const getDashboardSupplierScorecard = () =>
+  request<DashboardResult<SupplierScorecard[]>>('/dashboard/supplier-scorecard')

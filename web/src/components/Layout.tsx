@@ -5,6 +5,9 @@ import { CHANGE_EVENT, loadRecentRequisitions, type RecentRequisition } from '..
 import { useCurrentUser } from '../session/SessionContext'
 import { DocumentLookup } from './DocumentLookup'
 import { LanguageSwitcher } from './LanguageSwitcher'
+import { TechnicalModeToggle } from './TechnicalModeToggle'
+
+const MANAGER_ROLES = new Set(['manager', 'finance', 'approver'])
 
 const navClass = ({ isActive }: { isActive: boolean }) => (isActive ? 'app-nav__link is-active' : 'app-nav__link')
 
@@ -70,6 +73,7 @@ export function Layout() {
               </button>
             </>
           )}
+          <TechnicalModeToggle />
           <LanguageSwitcher />
         </div>
       </header>
@@ -88,6 +92,12 @@ export function Layout() {
                 <RecentRequisitions userId={user.id} />
               </>
             )}
+            <div className="app-nav__group">
+              <NavLink to="/dashboard" className={navClass}>
+                {t('nav.dashboard')}
+              </NavLink>
+              {!MANAGER_ROLES.has(user.role) && <p className="app-nav__note">{t('nav.dashboardNotice')}</p>}
+            </div>
             <DocumentLookup />
           </nav>
         )}

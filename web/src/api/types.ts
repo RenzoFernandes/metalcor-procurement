@@ -266,3 +266,53 @@ export interface InvoiceExceptionsQuery {
   page?: number
   size?: number
 }
+
+// Dashboard
+
+/** Envelope returned by every /dashboard endpoint: the data plus the exact SQL that produced it. */
+export interface DashboardResult<T> {
+  data: T
+  sql: string
+}
+
+export interface DashboardKpis {
+  totalSpend: DashboardResult<number>
+  orders: DashboardResult<number>
+  openExceptionInvoices: DashboardResult<number>
+  blockedAmount: DashboardResult<number>
+  overallOnTimeDeliveryPct: DashboardResult<number | null>
+}
+
+export interface SpendByMonthCategory {
+  orderMonth: string
+  categoryCode: string
+  categoryName: string
+  orders: number
+  items: number
+  totalValue: number
+  suppliers: number
+}
+
+export type ExceptionResolutionState = 'open' | 'released' | 'cancelled'
+
+export interface ExceptionSummary {
+  exceptionType: ExceptionType
+  resolution: ExceptionResolutionState
+  invoiceCount: number
+  grossAmount: number
+}
+
+export interface LatePaymentsByMonth {
+  dueMonth: string
+  payments: number
+  latePayments: number
+  avgDaysLate: number | null
+}
+
+export interface StaleInvoice {
+  invoiceNumber: string
+  amount: number
+  ageDays: number
+  ageBand: '0-15' | '16-30' | '31-45' | '46-90' | '90+'
+  blockReason: string | null
+}

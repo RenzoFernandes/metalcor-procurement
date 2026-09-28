@@ -14,7 +14,8 @@
   "header": {
     "currentUser": "Usuário atual",
     "switchUser": "Trocar usuário",
-    "language": "Idioma"
+    "language": "Idioma",
+    "technicalMode": "Modo técnico"
   },
   "nav": {
     "label": "Navegação",
@@ -22,7 +23,14 @@
     "newRequisition": "Nova requisição",
     "recent": "Requisições recentes",
     "recentEmpty": "Nenhuma requisição criada nesta sessão.",
-    "recentNote": "Só aparecem as criadas nesta sessão do navegador (a API ainda não tem listagem)."
+    "recentNote": "Só aparecem as criadas nesta sessão do navegador (a API ainda não tem listagem).",
+    "dashboard": "Painel",
+    "dashboardNotice": "O painel é voltado à gestão (gestor, financeiro e aprovador), mas a leitura é aberta a todos os perfis."
+  },
+  "technical": {
+    "sql": "SQL",
+    "copy": "Copiar",
+    "copied": "Copiado!"
   },
   "lookup": {
     "title": "Buscar documento",
@@ -53,8 +61,16 @@
   "home": {
     "welcome": "Bem-vindo(a), {name}",
     "roleLine": "Você está entrando como {role}.",
-    "scriptTitle": "Roteiro de teste",
-    "scriptPlaceholder": "Aqui vai o roteiro de teste com três tarefas para percorrer o fluxo de compras. As tarefas serão definidas nas próximas versões."
+    "tasksTitle": "Roteiro de teste",
+    "tasksIntro": "Três tarefas para percorrer o fluxo de compras, do pedido ao pagamento.",
+    "task1Title": "1. Criar uma requisição",
+    "task1Text": "Entre como Solicitante e crie uma requisição de compra com um ou mais itens.",
+    "task1Link": "Nova requisição",
+    "task2Title": "2. Aprovar e emitir o pedido",
+    "task2Text": "Entre como Comprador (ou Aprovador, conforme a regra por valor). Use \"Buscar documento\", na barra lateral, com o número da requisição do passo 1 para abri-la, aprová-la e emitir o pedido de compra.",
+    "task3Title": "3. Receber, faturar, pagar e ver o SQL",
+    "task3Text": "Entre como Financeiro, abra o pedido pela busca de documento e registre o recebimento, a fatura e o pagamento. Depois abra o Painel com o modo técnico ligado para ver o SQL por trás de cada número.",
+    "task3Link": "Abrir o Painel"
   },
   "fields": {
     "plantId": "Planta",
@@ -209,6 +225,74 @@
     "paidAt": "Data do pagamento",
     "createdBy": "Registrado por",
     "linkLimitation": "Limitação provisória: a API devolve só o número da fatura, sem o ID, então a fatura de origem não vira link."
+  },
+  "dashboard": {
+    "title": "Painel do gestor",
+    "intro": "Números e gráficos do fluxo de compras. Ligue o modo técnico, no cabeçalho, para ver o SQL de cada um.",
+    "kpis": {
+      "totalSpend": "Gasto total",
+      "orders": "Pedidos",
+      "openExceptionInvoices": "Faturas com exceção aberta",
+      "blockedAmount": "Valor bloqueado",
+      "onTimeDelivery": "Pontualidade de entrega"
+    },
+    "charts": {
+      "spendByMonth": {
+        "title": "Gasto por mês",
+        "description": "Valor total dos pedidos por mês, empilhado por categoria de material."
+      },
+      "exceptionSummary": {
+        "title": "Exceções por tipo",
+        "description": "Faturas com exceção do three-way match, abertas x liberadas."
+      },
+      "latePayments": {
+        "title": "Pagamentos atrasados por mês",
+        "description": "Total de pagamentos atrasados e média de dias de atraso dos atrasados."
+      },
+      "supplierScorecard": {
+        "title": "Ranking de fornecedores",
+        "description": "Pontualidade de entrega e taxa de exceção de fatura, ordenado por gasto total."
+      }
+    },
+    "staleInvoices": {
+      "title": "Faturas paradas",
+      "description": "Faturas bloqueadas há mais de 45 dias por exceção do three-way match.",
+      "number": "Número",
+      "amount": "Valor",
+      "age": "Idade (dias)",
+      "ageBand": "Faixa de idade",
+      "reason": "Motivo",
+      "empty": "Nenhuma fatura parada no momento."
+    },
+    "exceptionType": {
+      "price_variance": "Preço",
+      "quantity_variance": "Quantidade",
+      "invoice_before_receipt": "Fatura antes do recebimento"
+    },
+    "resolution": {
+      "open": "Aberta",
+      "released": "Liberada",
+      "cancelled": "Cancelada"
+    },
+    "ageBand": {
+      "0-15": "0–15 dias",
+      "16-30": "16–30 dias",
+      "31-45": "31–45 dias",
+      "46-90": "46–90 dias",
+      "90+": "Acima de 90 dias"
+    },
+    "axis": {
+      "totalDelayed": "Atrasos",
+      "avgDaysLate": "Média de dias de atraso",
+      "onTimePct": "Pontualidade (%)",
+      "exceptionRatePct": "Taxa de exceção (%)"
+    },
+    "tooltip": {
+      "orders": "pedidos",
+      "items": "itens",
+      "suppliers": "fornecedores",
+      "invoices": "faturas"
+    }
   },
   "errors": {
     "line": "Item {n}",

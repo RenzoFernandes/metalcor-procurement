@@ -141,4 +141,10 @@ public class DashboardRepository {
                 new DashboardResult<>(blockedAmount, KPI_BLOCKED_AMOUNT_SQL),
                 new DashboardResult<>(overallOnTimeDeliveryPct, KPI_OVERALL_ON_TIME_DELIVERY_PCT_SQL));
     }
+
+    /** Same queries behind the panel, gathered in one transaction for the Excel export. */
+    public DashboardExportBundle exportBundle() {
+        return new DashboardExportBundle(
+                kpis(), spendByMonth(), exceptionSummary(), latePayments(), supplierScorecard(), staleInvoices());
+    }
 }

@@ -229,6 +229,10 @@
   "dashboard": {
     "title": "Painel do gestor",
     "intro": "Números e gráficos do fluxo de compras. Ligue o modo técnico, no cabeçalho, para ver o SQL de cada um.",
+    "export": {
+      "button": "Exportar para Excel",
+      "loading": "Gerando…"
+    },
     "kpis": {
       "totalSpend": "Gasto total",
       "orders": "Pedidos",

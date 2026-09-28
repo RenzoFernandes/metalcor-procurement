@@ -13,6 +13,7 @@ import { ErrorNotice, LoadingNotice } from '../components/ErrorNotice'
 import { useTranslation } from '../i18n/I18nContext'
 import { useCurrentUser } from '../session/SessionContext'
 import { ExceptionSummaryChart } from './dashboard/ExceptionSummaryChart'
+import { ExportButton } from './dashboard/ExportButton'
 import { KpiCards } from './dashboard/KpiCards'
 import { LatePaymentsPanel } from './dashboard/LatePaymentsPanel'
 import { SpendByMonthChart } from './dashboard/SpendByMonthChart'
@@ -42,6 +43,8 @@ export function DashboardPage() {
     <section>
       <h1>{t('dashboard.title')}</h1>
       <p className="muted">{t('dashboard.intro')}</p>
+
+      <ExportButton />
 
       <Section loading={kpis.loading} error={kpis.error}>
         {kpis.data && <KpiCards kpis={kpis.data} />}

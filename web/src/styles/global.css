@@ -452,6 +452,8 @@ p { margin: 0 0 var(--space-3); }
 .dashboard-grid__full { grid-column: 1 / -1; }
 .dashboard-grid__full > * { height: 100%; }
 
+.dashboard-export { display: flex; flex-direction: column; align-items: flex-start; gap: var(--space-2); margin-bottom: var(--space-3); }
+
 .chart-card {
   display: flex;
   flex-direction: column;

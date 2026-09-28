@@ -229,6 +229,10 @@
   "dashboard": {
     "title": "Manager dashboard",
     "intro": "Numbers and charts for the procurement flow. Turn on technical mode, in the header, to see the SQL behind each one.",
+    "export": {
+      "button": "Export to Excel",
+      "loading": "Generating…"
+    },
     "kpis": {
       "totalSpend": "Total spend",
       "orders": "Orders",

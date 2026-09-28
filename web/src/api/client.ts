@@ -174,3 +174,37 @@ export const getDashboardStaleInvoices = () =>
 
 export const getDashboardSupplierScorecard = () =>
   request<DashboardResult<SupplierScorecard[]>>('/dashboard/supplier-scorecard')
+
+function fileNameFromContentDisposition(headerValue: string | null): string | null {
+  if (!headerValue) return null
+  const match = /filename="?([^";]+)"?/.exec(headerValue)
+  return match ? match[1] : null
+}
+
+export async function downloadDashboardExport(userId: number): Promise<{ blob: Blob; fileName: string }> {
+  const url = new URL(BASE_URL + '/dashboard/export.xlsx')
+
+  let response: Response
+  try {
+    response = await fetch(url, { headers: { 'X-User-Id': String(userId) } })
+  } catch {
+    throw new ApiError(0, null, null)
+  }
+
+  if (!response.ok) {
+    let title: string | null = null
+    let detail: string | null = null
+    try {
+      const problem = await response.json()
+      title = typeof problem.title === 'string' ? problem.title : null
+      detail = typeof problem.detail === 'string' ? problem.detail : null
+    } catch {
+      // Body is not a ProblemDetail: keep only the status.
+    }
+    throw new ApiError(response.status, title, detail)
+  }
+
+  const blob = await response.blob()
+  const fileName = fileNameFromContentDisposition(response.headers.get('Content-Disposition')) ?? 'metalcor-painel.xlsx'
+  return { blob, fileName }
+}

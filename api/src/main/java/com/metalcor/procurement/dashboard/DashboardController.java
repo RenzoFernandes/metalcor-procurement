@@ -3,7 +3,11 @@ package com.metalcor.procurement.dashboard;
 import com.metalcor.procurement.supplier.SupplierScorecardDto;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import java.time.LocalDate;
 import java.util.List;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -18,9 +22,11 @@ import org.springframework.web.bind.annotation.RestController;
 public class DashboardController {
 
     private final DashboardRepository dashboard;
+    private final ExcelExportService excelExport;
 
-    public DashboardController(DashboardRepository dashboard) {
+    public DashboardController(DashboardRepository dashboard, ExcelExportService excelExport) {
         this.dashboard = dashboard;
+        this.excelExport = excelExport;
     }
 
     @GetMapping("/spend-by-month")
@@ -63,5 +69,20 @@ public class DashboardController {
             description = "Total spend, number of orders, invoices with an open match exception, blocked amount and overall on-time delivery rate. Each number comes from its own query and carries its own SQL.")
     public DashboardKpisDto kpis() {
         return dashboard.kpis();
+    }
+
+    @GetMapping("/export.xlsx")
+    @Operation(summary = "Export the manager panel as an Excel workbook",
+            description = "Same data and SQL behind the panel (kpis, spend-by-month, exception-summary, late-payments, "
+                    + "supplier-scorecard and stale-invoices), as a downloadable .xlsx with one sheet per topic plus a SQL sheet.")
+    public ResponseEntity<byte[]> exportXlsx() {
+        DashboardExportBundle bundle = dashboard.exportBundle();
+        byte[] workbook = excelExport.build(bundle, LocalDate.now());
+        String fileName = ExcelExportService.fileName(LocalDate.now());
+
+        return ResponseEntity.ok()
+                .contentType(MediaType.parseMediaType("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"))
+                .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + fileName + "\"")
+                .body(workbook);
     }
 }

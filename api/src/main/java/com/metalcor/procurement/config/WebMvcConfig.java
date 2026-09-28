@@ -31,6 +31,7 @@ public class WebMvcConfig implements WebMvcConfigurer {
                 .allowedOrigins(corsAllowedOrigin)
                 .allowedMethods("GET", "POST")
                 .allowedHeaders("*")
+                .exposedHeaders("Content-Disposition")
                 .allowCredentials(false);
     }
 }

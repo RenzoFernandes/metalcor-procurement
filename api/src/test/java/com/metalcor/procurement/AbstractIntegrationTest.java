@@ -53,6 +53,11 @@ public abstract class AbstractIntegrationTest {
         registry.add("spring.datasource.password", () -> APP_PASSWORD);
         // Migrations are applied above as the owner, never by the application.
         registry.add("spring.flyway.enabled", () -> "false");
+
+        // Copilot's own read-only connection (V10's metalcor_readonly).
+        registry.add("copilot.datasource.url", POSTGRES::getJdbcUrl);
+        registry.add("copilot.datasource.username", () -> "metalcor_readonly");
+        registry.add("copilot.datasource.password", () -> READONLY_PASSWORD);
     }
 
     private static void migrate(Path migrations) {

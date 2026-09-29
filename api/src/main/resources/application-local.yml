@@ -5,6 +5,10 @@ spring:
   datasource:
     password: ${APP_DB_PASSWORD:metalcor_app_dev}
 
+copilot:
+  datasource:
+    password: ${READONLY_DB_PASSWORD:metalcor_readonly_dev}
+
 app:
   cors:
     # Origin of the Vite dev server. Override with APP_CORS_ALLOWED_ORIGIN.

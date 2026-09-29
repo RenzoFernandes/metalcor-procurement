@@ -81,6 +81,13 @@ public class ApiExceptionHandler extends ResponseEntityExceptionHandler {
         return problem;
     }
 
+    @ExceptionHandler(ServiceUnavailableException.class)
+    public ProblemDetail handleServiceUnavailable(ServiceUnavailableException ex) {
+        ProblemDetail problem = ProblemDetail.forStatusAndDetail(HttpStatus.SERVICE_UNAVAILABLE, ex.getMessage());
+        problem.setTitle("Service unavailable");
+        return problem;
+    }
+
     /** Anything unexpected: generic message to the client, full detail only in the log. */
     @ExceptionHandler(Exception.class)
     public ProblemDetail handleUnexpected(Exception ex, HttpServletRequest request) {

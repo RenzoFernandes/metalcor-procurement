@@ -36,4 +36,5 @@ services:
       - ./db/init:/flyway/sql:ro
 
 volumes:
+
   db_data:

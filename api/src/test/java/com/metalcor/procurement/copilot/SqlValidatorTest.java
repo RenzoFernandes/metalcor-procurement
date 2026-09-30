@@ -57,4 +57,68 @@ class SqlValidatorTest {
         assertThatThrownBy(() -> SqlValidator.validateAndLimit(null))
                 .isInstanceOf(BadRequestException.class);
     }
+
+    @Test
+    void rejectsNewForbiddenFeatures() {
+        for (String sql : new String[] {
+                "copy materials to stdout",
+                "select pg_sleep(10)",
+                "select \"pg_sleep\"(10)",
+                "select pg_read_file('/etc/passwd')",
+                "select * from dblink('host=x', 'select 1') as t(a int)",
+                "select set_config('app.current_user_id', '1', false)",
+                "select * into new_table from materials"}) {
+            assertThatThrownBy(() -> SqlValidator.validateAndLimit(sql))
+                    .as(sql).isInstanceOf(BadRequestException.class);
+        }
+    }
+
+    @Test
+    void limitInsideASubqueryDoesNotCountForTheOuterQuery() {
+        String sql = SqlValidator.validateAndLimit(
+                "select * from (select * from vw_invoice_match limit 5) t");
+        assertThat(sql).endsWith("LIMIT 50");
+    }
+
+    @Test
+    void topLevelLimitIsKeptEvenWithASubqueryLimit() {
+        String original = "select * from (select * from vw_invoice_match limit 5) t limit 7";
+        assertThat(SqlValidator.validateAndLimit(original)).isEqualTo(original);
+    }
+
+    @Test
+    void limitWordInsideALiteralDoesNotCount() {
+        String sql = SqlValidator.validateAndLimit("select * from suppliers where name = 'no limit'");
+        assertThat(sql).endsWith("LIMIT 50");
+    }
+
+    @Test
+    void limitIsNotSwallowedByATrailingComment() {
+        String sql = SqlValidator.validateAndLimit("select 1 -- note");
+        assertThat(sql).endsWith("\nLIMIT 50");
+    }
+
+    @Test
+    void semicolonInsideAStringLiteralIsAllowed() {
+        String sql = SqlValidator.validateAndLimit("select * from suppliers where name = 'A;B'");
+        assertThat(sql).contains("'A;B'");
+    }
+
+    @Test
+    void semicolonAfterALiteralStillSeparatesStatements() {
+        assertThatThrownBy(() -> SqlValidator.validateAndLimit("select 'a'; select 'b'"))
+                .isInstanceOf(BadRequestException.class);
+    }
+
+    @Test
+    void forbiddenWordInsideALiteralIsNotAFalsePositive() {
+        assertThat(SqlValidator.validateAndLimit("select * from suppliers where name = 'Delete Co'"))
+                .contains("'Delete Co'");
+    }
+
+    @Test
+    void unterminatedLiteralIsRejected() {
+        assertThatThrownBy(() -> SqlValidator.validateAndLimit("select 'abc"))
+                .isInstanceOf(BadRequestException.class);
+    }
 }

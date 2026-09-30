@@ -9,8 +9,8 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.servlet.HandlerInterceptor;
 
 /**
- * Reads X-User-Id on every /api/v1/** request. Required on writes (any method other than GET),
- * optional on GET. When present, the id must identify an active app_users row; otherwise 401.
+ * Reads X-User-Id on every /api/v1/** request. Required on all methods (reads included), and the
+ * id must identify an active app_users row; otherwise 401. CORS preflight (OPTIONS) is exempt.
  */
 @Component
 public class CurrentUserInterceptor implements HandlerInterceptor {
@@ -33,13 +33,8 @@ public class CurrentUserInterceptor implements HandlerInterceptor {
         }
 
         String header = request.getHeader(HEADER);
-        boolean write = !"GET".equalsIgnoreCase(request.getMethod());
-
         if (header == null || header.isBlank()) {
-            if (write) {
-                throw new UnauthorizedException("Header " + HEADER + " is required.");
-            }
-            return true;
+            throw new UnauthorizedException("Header " + HEADER + " is required.");
         }
 
         long userId;

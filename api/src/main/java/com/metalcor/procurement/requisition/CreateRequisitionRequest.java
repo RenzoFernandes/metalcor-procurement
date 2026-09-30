@@ -24,6 +24,7 @@ public record CreateRequisitionRequest(
         LocalDate neededBy,
 
         @Schema(description = "Free-text notes.")
+        @Size(max = 1000, message = "must be at most 1000 characters")
         String notes,
 
         @Schema(description = "Line items, 1 to 8.")

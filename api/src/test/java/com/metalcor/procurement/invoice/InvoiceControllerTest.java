@@ -174,6 +174,7 @@ class InvoiceControllerTest extends AbstractIntegrationTest {
         long itemId = firstItemId(orderId);
 
         mockMvc.perform(post("/api/v1/purchase-orders/" + orderId + "/invoices")
+                        .header("X-User-Id", "") // blank = missing; DefaultUserHeaderConfig adds a default
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(invoiceBody("NF-0008", "2026-09-20", null, itemId, "10", PO_UNIT_PRICE)))
                 .andExpect(status().isUnauthorized());

@@ -65,6 +65,7 @@ class RequisitionControllerTest extends AbstractIntegrationTest {
     @Test
     void createWithoutUserHeaderReturnsUnauthorized() throws Exception {
         mockMvc.perform(post("/api/v1/requisitions")
+                        .header("X-User-Id", "") // blank = missing; DefaultUserHeaderConfig adds a default
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(smallRequisitionBody()))
                 .andExpect(status().isUnauthorized());

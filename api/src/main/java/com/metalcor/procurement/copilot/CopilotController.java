@@ -1,6 +1,7 @@
 package com.metalcor.procurement.copilot;
 
 import io.swagger.v3.oas.annotations.Operation;
+import com.metalcor.procurement.security.CurrentUser;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -10,8 +11,8 @@ import org.springframework.web.bind.annotation.RestController;
 
 /**
  * Natural-language questions answered with a read-only SQL query, run as metalcor_readonly.
- * A write endpoint, so CurrentUserInterceptor already requires a valid X-User-Id; any active user
- * is accepted, with no role restriction.
+ * CurrentUserInterceptor requires a valid X-User-Id; any active user is accepted, with no role
+ * restriction, but each user is limited to a few questions per minute (CopilotRateLimiter).
  */
 @RestController
 @RequestMapping("/api/v1/copilot")
@@ -19,9 +20,13 @@ import org.springframework.web.bind.annotation.RestController;
 public class CopilotController {
 
     private final CopilotService copilotService;
+    private final CopilotRateLimiter rateLimiter;
+    private final CurrentUser currentUser;
 
-    public CopilotController(CopilotService copilotService) {
+    public CopilotController(CopilotService copilotService, CopilotRateLimiter rateLimiter, CurrentUser currentUser) {
         this.copilotService = copilotService;
+        this.rateLimiter = rateLimiter;
+        this.currentUser = currentUser;
     }
 
     @PostMapping("/query")
@@ -29,6 +34,7 @@ public class CopilotController {
             description = "Sends the question to the configured model (local Ollama or Google Gemini), validates that it answered with a single "
                     + "read-only SELECT, runs it as metalcor_readonly and returns the rows.")
     public CopilotQueryResponse query(@Valid @RequestBody CopilotQueryRequest request) {
+        rateLimiter.acquire(currentUser.id());
         return copilotService.ask(request.pergunta());
     }
 }

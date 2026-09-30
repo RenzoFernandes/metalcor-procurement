@@ -26,6 +26,8 @@ app:
   copilot:
     # Which model provider answers the copilot: ollama (local, default) or gemini (hosted, Google Gemini API).
     provider: ${COPILOT_PROVIDER:ollama}
+    # Questions per user per minute on /copilot/query (each one spends model quota and a read-only connection).
+    rate-limit-per-minute: ${COPILOT_RATE_LIMIT_PER_MINUTE:10}
     gemini:
       base-url: https://generativelanguage.googleapis.com
       # No default on purpose and never committed: only needed when provider=gemini.

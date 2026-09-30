@@ -60,6 +60,16 @@ function parseFieldErrors(value: unknown): FieldError[] {
   )
 }
 
+/**
+ * The API requires X-User-Id on every call, reads included. SessionProvider keeps this in sync with
+ * the user chosen in "Entrar como", so GETs need no userId argument.
+ */
+let sessionUserId: number | null = null
+
+export function setApiUserId(userId: number | null): void {
+  sessionUserId = userId
+}
+
 interface RequestOptions {
   method?: 'GET' | 'POST'
   body?: unknown
@@ -68,7 +78,8 @@ interface RequestOptions {
 }
 
 async function request<T>(path: string, options: RequestOptions = {}): Promise<T> {
-  const { method = 'GET', body, userId, query } = options
+  const { method = 'GET', body, query } = options
+  const userId = options.userId ?? sessionUserId ?? undefined
 
   const url = new URL(BASE_URL + path)
   if (query) {

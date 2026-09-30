@@ -5,6 +5,7 @@ import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Size;
 import java.time.LocalDate;
 import java.util.List;
 
@@ -13,6 +14,7 @@ public record InvoiceRequest(
 
         @Schema(description = "Invoice number as printed by the supplier. Unique per supplier.")
         @NotBlank(message = "must not be blank")
+        @Size(max = 30, message = "must be at most 30 characters")
         String supplierInvoiceNumber,
 
         @Schema(description = "Date on the supplier invoice.")
@@ -24,6 +26,7 @@ public record InvoiceRequest(
 
         @Schema(description = "Line items billed.")
         @NotEmpty(message = "must contain at least one item")
+        @Size(max = 8, message = "must contain at most 8 items")
         @Valid
         List<InvoiceItemRequest> items) {
 }

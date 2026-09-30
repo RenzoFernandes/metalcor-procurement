@@ -304,6 +304,7 @@
     "title": "Copiloto (beta)",
     "close": "Fechar",
     "intro": "Faça uma pergunta em linguagem natural sobre pedidos, faturas, fornecedores etc.",
+    "rateLimited": "Muitas perguntas em pouco tempo. Aguarde um minuto e tente novamente.",
     "placeholder": "Digite sua pergunta…",
     "send": "Enviar",
     "sending": "Gerando resposta…",

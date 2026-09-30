@@ -9,3 +9,9 @@ app:
     allowed-origin: ${APP_CORS_ALLOWED_ORIGIN}
   copilot:
     provider: ${COPILOT_PROVIDER:gemini}
+# Swagger UI and the OpenAPI document are development tools: off in production.
+springdoc:
+  api-docs:
+    enabled: false
+  swagger-ui:
+    enabled: false

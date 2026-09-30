@@ -10,6 +10,7 @@ import java.util.stream.Stream;
 import org.flywaydb.core.Flyway;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
+import org.springframework.context.annotation.Import;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
@@ -24,6 +25,7 @@ import org.testcontainers.utility.MountableFile;
  */
 @SpringBootTest
 @AutoConfigureMockMvc
+@Import(DefaultUserHeaderConfig.class)
 public abstract class AbstractIntegrationTest {
 
     private static final String OWNER = "metalcor";

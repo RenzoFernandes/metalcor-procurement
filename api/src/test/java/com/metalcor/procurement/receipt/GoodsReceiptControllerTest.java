@@ -130,6 +130,7 @@ class GoodsReceiptControllerTest extends AbstractIntegrationTest {
         long itemId = firstItemId(orderId);
 
         mockMvc.perform(post("/api/v1/purchase-orders/" + orderId + "/receipts")
+                        .header("X-User-Id", "") // blank = missing; DefaultUserHeaderConfig adds a default
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(receiptBody(itemId, "5")))
                 .andExpect(status().isUnauthorized());

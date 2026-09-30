@@ -89,8 +89,46 @@ class CopilotControllerTest extends AbstractIntegrationTest {
         llm.respondWith("```sql\nselect 1\n```");
 
         mockMvc.perform(post("/api/v1/copilot/query")
+                        .header("X-User-Id", "") // blank = missing; DefaultUserHeaderConfig adds a default
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("{\"pergunta\": \"teste\"}"))
                 .andExpect(status().isUnauthorized());
+    }
+
+    @Test
+    void tooLongQuestionIsRejected() throws Exception {
+        mockMvc.perform(post("/api/v1/copilot/query")
+                        .header("X-User-Id", USER_ID)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("{\"pergunta\": \"" + "a".repeat(2001) + "\"}"))
+                .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    void exceedingTheRateLimitReturns429WithRetryAfter() throws Exception {
+        llm.respondWith("```sql\nselect 1\n```");
+
+        for (int i = 0; i < 10; i++) {
+            mockMvc.perform(post("/api/v1/copilot/query")
+                            .header("X-User-Id", "6")
+                            .contentType(MediaType.APPLICATION_JSON)
+                            .content("{\"pergunta\": \"teste\"}"))
+                    .andExpect(status().isOk());
+        }
+
+        mockMvc.perform(post("/api/v1/copilot/query")
+                        .header("X-User-Id", "6")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("{\"pergunta\": \"teste\"}"))
+                .andExpect(status().isTooManyRequests())
+                .andExpect(org.springframework.test.web.servlet.result.MockMvcResultMatchers.header().exists("Retry-After"))
+                .andExpect(jsonPath("$.title").value("Too many requests"));
+
+        // The limit is per user: someone else is not affected.
+        mockMvc.perform(post("/api/v1/copilot/query")
+                        .header("X-User-Id", USER_ID)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("{\"pergunta\": \"teste\"}"))
+                .andExpect(status().isOk());
     }
 }

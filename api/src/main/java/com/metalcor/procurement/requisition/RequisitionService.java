@@ -32,6 +32,7 @@ public class RequisitionService {
 
     @Transactional
     public RequisitionResponse create(CreateRequisitionRequest request) {
+        requireRequester("create");
         setAuditUser();
 
         Set<Long> materialIds = request.items().stream()
@@ -69,6 +70,7 @@ public class RequisitionService {
 
     @Transactional
     public RequisitionResponse submit(long id) {
+        requireRequester("submit");
         setAuditUser();
         String status = requisitions.findStatus(id)
                 .orElseThrow(() -> new NotFoundException("Requisition " + id + " does not exist."));
@@ -82,10 +84,6 @@ public class RequisitionService {
     @Transactional
     public RequisitionResponse decide(long id, DecisionRequest request) {
         setAuditUser();
-
-        if ("reject".equals(request.decision()) && (request.comment() == null || request.comment().isBlank())) {
-            throw new BadRequestException("comment is required when decision is reject.");
-        }
 
         StatusAndTotal statusAndTotal = requisitions.findStatusAndTotal(id)
                 .orElseThrow(() -> new NotFoundException("Requisition " + id + " does not exist."));
@@ -116,6 +114,12 @@ public class RequisitionService {
     public RequisitionResponse get(long id) {
         return requisitions.findById(id)
                 .orElseThrow(() -> new NotFoundException("Requisition " + id + " does not exist."));
+    }
+
+    private void requireRequester(String action) {
+        if (!"requester".equals(currentUser.role())) {
+            throw new ForbiddenException("Role requester is required to " + action + " requisitions.");
+        }
     }
 
     private void setAuditUser() {

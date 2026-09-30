@@ -16,7 +16,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.simple.JdbcClient;
 import org.springframework.test.web.servlet.MvcResult;
 
-/** Endpoints of the manager panel (GET /api/v1/dashboard/**). Read-only, no X-User-Id needed. */
+/** Endpoints of the manager panel (GET /api/v1/dashboard/**). Read-only; X-User-Id is added by DefaultUserHeaderConfig. */
 @Order(0)
 class DashboardTest extends AbstractIntegrationTest {
 

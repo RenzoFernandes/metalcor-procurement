@@ -2,6 +2,7 @@ package com.metalcor.procurement.receipt;
 
 import com.metalcor.procurement.common.BadRequestException;
 import com.metalcor.procurement.common.ConflictException;
+import com.metalcor.procurement.common.ForbiddenException;
 import com.metalcor.procurement.common.NotFoundException;
 import com.metalcor.procurement.receipt.ReceiptRepository.ItemProgress;
 import com.metalcor.procurement.receipt.ReceiptRepository.OrderInfo;
@@ -34,6 +35,9 @@ public class ReceiptService {
 
     @Transactional
     public CreateReceiptResponse createReceipt(long orderId, ReceiptRequest request) {
+        if (!"requester".equals(currentUser.role())) {
+            throw new ForbiddenException("Role requester is required to register goods receipts.");
+        }
         setAuditUser();
 
         OrderInfo order = receipts.findOrderStatusAndPlant(orderId)

@@ -298,6 +298,19 @@
       "invoices": "faturas"
     }
   },
+  "copilot": {
+    "fabLabel": "Abrir copiloto",
+    "fabText": "Copiloto",
+    "title": "Copiloto (beta)",
+    "close": "Fechar",
+    "intro": "Faça uma pergunta em linguagem natural sobre pedidos, faturas, fornecedores etc.",
+    "placeholder": "Digite sua pergunta…",
+    "send": "Enviar",
+    "sending": "Gerando resposta…",
+    "sql": "SQL gerado",
+    "rows": "{count} linha(s)",
+    "noRows": "A consulta não retornou linhas."
+  },
   "errors": {
     "line": "Item {n}",
     "unexpected": "Algo deu errado. Tente novamente.",

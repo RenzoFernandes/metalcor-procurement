@@ -13,16 +13,16 @@ public class CopilotService {
     private static final Pattern SQL_FENCE = Pattern.compile("```sql\\s*(.*?)```", Pattern.DOTALL | Pattern.CASE_INSENSITIVE);
     private static final Pattern ANY_FENCE = Pattern.compile("```\\s*(.*?)```", Pattern.DOTALL);
 
-    private final OllamaClient ollamaClient;
+    private final CopilotLlmClient llmClient;
     private final CopilotRepository repository;
 
-    public CopilotService(OllamaClient ollamaClient, CopilotRepository repository) {
-        this.ollamaClient = ollamaClient;
+    public CopilotService(CopilotLlmClient llmClient, CopilotRepository repository) {
+        this.llmClient = llmClient;
         this.repository = repository;
     }
 
     public CopilotQueryResponse ask(String question) {
-        String modelResponse = ollamaClient.generateSql(question);
+        String modelResponse = llmClient.generateSql(question);
         String rawSql = extractSql(modelResponse);
         String sql = SqlValidator.validateAndLimit(rawSql);
 

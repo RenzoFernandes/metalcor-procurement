@@ -22,6 +22,16 @@ copilot:
     base-url: ${OLLAMA_BASE_URL:http://localhost:11434}
     model: ${OLLAMA_MODEL:qwen2.5-coder:7b}
 
+app:
+  copilot:
+    # Which model provider answers the copilot: ollama (local, default) or gemini (hosted, Google Gemini API).
+    provider: ${COPILOT_PROVIDER:ollama}
+    gemini:
+      base-url: https://generativelanguage.googleapis.com
+      # No default on purpose and never committed: only needed when provider=gemini.
+      api-key: ${GEMINI_API_KEY:}
+      model: ${GEMINI_MODEL:gemini-3.8-flash}
+
 management:
   endpoints:
     web:

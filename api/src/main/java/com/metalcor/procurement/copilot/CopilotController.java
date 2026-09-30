@@ -26,7 +26,7 @@ public class CopilotController {
 
     @PostMapping("/query")
     @Operation(summary = "Ask the SQL copilot a question in natural language",
-            description = "Sends the question to a local Ollama model, validates that it answered with a single "
+            description = "Sends the question to the configured model (local Ollama or Google Gemini), validates that it answered with a single "
                     + "read-only SELECT, runs it as metalcor_readonly and returns the rows.")
     public CopilotQueryResponse query(@Valid @RequestBody CopilotQueryRequest request) {
         return copilotService.ask(request.pergunta());

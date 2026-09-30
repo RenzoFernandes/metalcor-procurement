@@ -1,6 +1,6 @@
 package com.metalcor.procurement.common;
 
-/** A dependency the request needs is unreachable (e.g. the local Ollama copilot). Maps to 503. */
+/** A dependency the request needs is unreachable (e.g. the copilot's model provider). Maps to 503. */
 public class ServiceUnavailableException extends RuntimeException {
 
     public ServiceUnavailableException(String message) {

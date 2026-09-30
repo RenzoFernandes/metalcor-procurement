@@ -3,6 +3,7 @@ import { NavLink, Outlet, useLocation, useNavigate } from 'react-router-dom'
 import { useTranslation } from '../i18n/I18nContext'
 import { CHANGE_EVENT, loadRecentRequisitions, type RecentRequisition } from '../session/recentRequisitions'
 import { useCurrentUser } from '../session/SessionContext'
+import { CopilotPanel } from './CopilotPanel'
 import { DocumentLookup } from './DocumentLookup'
 import { LanguageSwitcher } from './LanguageSwitcher'
 import { TechnicalModeToggle } from './TechnicalModeToggle'
@@ -109,6 +110,8 @@ export function Layout() {
       </div>
 
       <footer className="app-footer">{t('app.fictionalNotice')}</footer>
+
+      <CopilotPanel />
     </div>
   )
 }

@@ -1,7 +1,7 @@
 package com.metalcor.procurement.copilot;
 
 /**
- * Builds the prompt sent to Ollama: PostgreSQL dialect, single-SELECT instruction, a short schema
+ * Builds the prompt sent to the model (any provider): PostgreSQL dialect, single-SELECT instruction, a short schema
  * context and the user's question. The schema context mirrors the brief purpose already given in
  * each view's COMMENT ON VIEW (V8/V9) and shown on the manager dashboard.
  */

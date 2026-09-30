@@ -4,8 +4,8 @@ import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Primary;
 
-/** Test double for OllamaClient: returns a fixed, settable response instead of calling a real Ollama server. */
-public class StubOllamaClient implements OllamaClient {
+/** Test double for CopilotLlmClient: returns a fixed, settable response instead of calling a real model server. */
+public class StubCopilotLlmClient implements CopilotLlmClient {
 
     private volatile String nextResponse = "";
 
@@ -22,8 +22,8 @@ public class StubOllamaClient implements OllamaClient {
     public static class Config {
         @Bean
         @Primary
-        public StubOllamaClient stubOllamaClient() {
-            return new StubOllamaClient();
+        public StubCopilotLlmClient stubCopilotLlmClient() {
+            return new StubCopilotLlmClient();
         }
     }
 }

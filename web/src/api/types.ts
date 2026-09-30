@@ -316,3 +316,13 @@ export interface StaleInvoice {
   ageBand: '0-15' | '16-30' | '31-45' | '46-90' | '90+'
   blockReason: string | null
 }
+
+// Copilot
+
+export interface CopilotQueryResponse {
+  pergunta: string
+  sql: string
+  colunas: string[]
+  linhas: Record<string, unknown>[]
+  totalLinhas: number
+}

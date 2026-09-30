@@ -12,21 +12,21 @@ import org.springframework.context.annotation.Import;
 import org.springframework.http.MediaType;
 
 /**
- * POST /api/v1/copilot/query, with the real Ollama server replaced by StubOllamaClient: no
+ * POST /api/v1/copilot/query, with the real model provider replaced by StubCopilotLlmClient: no
  * network call is made, and the response text is fully controlled by each test.
  */
 @Order(0)
-@Import(StubOllamaClient.Config.class)
+@Import(StubCopilotLlmClient.Config.class)
 class CopilotControllerTest extends AbstractIntegrationTest {
 
     private static final String USER_ID = "1";
 
     @Autowired
-    private StubOllamaClient ollama;
+    private StubCopilotLlmClient llm;
 
     @Test
     void validSelectRunsAndReturnsRows() throws Exception {
-        ollama.respondWith("""
+        llm.respondWith("""
                 Here is the query:
                 ```sql
                 select category_code, category_name from vw_spend_by_month_category limit 5
@@ -46,7 +46,7 @@ class CopilotControllerTest extends AbstractIntegrationTest {
 
     @Test
     void writeStatementFromTheModelIsRejectedAndNeverExecuted() throws Exception {
-        ollama.respondWith("""
+        llm.respondWith("""
                 ```sql
                 DELETE FROM materials
                 ```
@@ -62,7 +62,7 @@ class CopilotControllerTest extends AbstractIntegrationTest {
 
     @Test
     void multipleStatementsFromTheModelAreRejected() throws Exception {
-        ollama.respondWith("```sql\nselect 1; drop table materials\n```");
+        llm.respondWith("```sql\nselect 1; drop table materials\n```");
 
         mockMvc.perform(post("/api/v1/copilot/query")
                         .header("X-User-Id", USER_ID)
@@ -73,7 +73,7 @@ class CopilotControllerTest extends AbstractIntegrationTest {
 
     @Test
     void syntacticallyValidSqlWithAnUnknownColumnIsRejectedAsBadRequestNotServerError() throws Exception {
-        ollama.respondWith("```sql\nselect coluna_que_nao_existe from vw_invoice_match\n```");
+        llm.respondWith("```sql\nselect coluna_que_nao_existe from vw_invoice_match\n```");
 
         mockMvc.perform(post("/api/v1/copilot/query")
                         .header("X-User-Id", USER_ID)
@@ -86,7 +86,7 @@ class CopilotControllerTest extends AbstractIntegrationTest {
 
     @Test
     void requiresAValidXUserIdHeader() throws Exception {
-        ollama.respondWith("```sql\nselect 1\n```");
+        llm.respondWith("```sql\nselect 1\n```");
 
         mockMvc.perform(post("/api/v1/copilot/query")
                         .contentType(MediaType.APPLICATION_JSON)

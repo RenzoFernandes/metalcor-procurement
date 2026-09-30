@@ -298,6 +298,19 @@
       "invoices": "invoices"
     }
   },
+  "copilot": {
+    "fabLabel": "Open copilot",
+    "fabText": "Copilot",
+    "title": "Copilot (beta)",
+    "close": "Close",
+    "intro": "Ask a natural-language question about orders, invoices, suppliers and so on.",
+    "placeholder": "Type your question…",
+    "send": "Send",
+    "sending": "Generating answer…",
+    "sql": "Generated SQL",
+    "rows": "{count} row(s)",
+    "noRows": "The query returned no rows."
+  },
   "errors": {
     "line": "Item {n}",
     "unexpected": "Something went wrong. Please try again.",

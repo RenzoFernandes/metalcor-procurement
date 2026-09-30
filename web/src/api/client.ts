@@ -1,5 +1,6 @@
 import type {
   ApprovalRequest,
+  CopilotQueryResponse,
   CreateReceiptResponse,
   CreateRequisitionRequest,
   DashboardKpis,
@@ -174,6 +175,11 @@ export const getDashboardStaleInvoices = () =>
 
 export const getDashboardSupplierScorecard = () =>
   request<DashboardResult<SupplierScorecard[]>>('/dashboard/supplier-scorecard')
+
+// Copilot
+
+export const askCopilot = (userId: number, pergunta: string) =>
+  request<CopilotQueryResponse>('/copilot/query', { method: 'POST', body: { pergunta }, userId })
 
 function fileNameFromContentDisposition(headerValue: string | null): string | null {
   if (!headerValue) return null

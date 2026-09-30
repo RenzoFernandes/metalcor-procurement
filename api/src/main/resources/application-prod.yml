@@ -1,0 +1,11 @@
+# Production: no development defaults. Everything sensitive comes from environment variables and the
+# app does not start without them (APP_DB_PASSWORD and READONLY_DB_PASSWORD have no default in
+# application.yml either).
+# Ollama is not reachable from the hosted API, so the copilot uses Gemini by default
+# (requires GEMINI_API_KEY). Override with COPILOT_PROVIDER=ollama if an Ollama server is available.
+app:
+  cors:
+    # Origin of the deployed front end, no default.
+    allowed-origin: ${APP_CORS_ALLOWED_ORIGIN}
+  copilot:
+    provider: ${COPILOT_PROVIDER:gemini}

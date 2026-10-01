@@ -173,7 +173,7 @@ class CopilotProviderTest {
 
         assertThatThrownBy(() -> clientWithKey("fake-key").generateSql("teste"))
                 .isInstanceOf(ServiceUnavailableException.class)
-                .hasMessage("Copiloto indisponível no momento. Tente novamente em alguns minutos.")
+                .hasMessage("Copilot is unavailable right now. Please try again in a few minutes.")
                 .hasMessageNotContaining("Ollama")
                 .hasMessageNotContaining("Gemini");
     }

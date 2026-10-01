@@ -46,8 +46,8 @@ public class CopilotRateLimiter {
                 long waitNanos = WINDOW_NANOS - (now - calls.peekFirst());
                 long retryAfter = Math.max(1, Duration.ofNanos(waitNanos).toSeconds() + 1);
                 throw new TooManyRequestsException(
-                        "Limite de " + maxPerMinute + " perguntas por minuto atingido. Tente novamente em "
-                                + retryAfter + " segundos.",
+                        "Limit of " + maxPerMinute + " questions per minute reached. Try again in "
+                                + retryAfter + " seconds.",
                         retryAfter);
             }
             calls.addLast(now);

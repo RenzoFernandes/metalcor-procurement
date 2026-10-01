@@ -2,7 +2,9 @@ spring:
   application:
     name: procurement-api
   datasource:
-    url: jdbc:postgresql://${DB_HOST:localhost}:${DB_PORT:5432}/${DB_NAME:metalcor}
+    # DB_SSLMODE defaults to disable for local Docker Compose; set it to require for hosted
+    # Postgres (Neon, RDS, etc.), which refuses plain connections.
+    url: jdbc:postgresql://${DB_HOST:localhost}:${DB_PORT:5432}/${DB_NAME:metalcor}?sslmode=${DB_SSLMODE:disable}
     username: ${APP_DB_USER:metalcor_app}
     # No default on purpose: the app does not start without it.
     password: ${APP_DB_PASSWORD}
@@ -14,7 +16,7 @@ spring:
 # (metalcor_readonly, CONNECTION LIMIT 5 in V10), so the pool here stays small.
 copilot:
   datasource:
-    url: jdbc:postgresql://${DB_HOST:localhost}:${DB_PORT:5432}/${DB_NAME:metalcor}
+    url: jdbc:postgresql://${DB_HOST:localhost}:${DB_PORT:5432}/${DB_NAME:metalcor}?sslmode=${DB_SSLMODE:disable}
     username: ${READONLY_DB_USER:metalcor_readonly}
     password: ${READONLY_DB_PASSWORD}
     max-pool-size: 3

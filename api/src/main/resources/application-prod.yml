@@ -3,6 +3,14 @@
 # application.yml either).
 # Ollama is not reachable from the hosted API, so the copilot uses Gemini by default
 # (requires GEMINI_API_KEY). Override with COPILOT_PROVIDER=ollama if an Ollama server is available.
+# Hosted Postgres (Neon, RDS...) refuses plain connections; override with DB_SSLMODE if a given
+# provider needs a different value (e.g. verify-full with a CA file).
+spring:
+  datasource:
+    url: jdbc:postgresql://${DB_HOST}:${DB_PORT:5432}/${DB_NAME}?sslmode=${DB_SSLMODE:require}
+copilot:
+  datasource:
+    url: jdbc:postgresql://${DB_HOST}:${DB_PORT:5432}/${DB_NAME}?sslmode=${DB_SSLMODE:require}
 app:
   cors:
     # Origin of the deployed front end, no default.

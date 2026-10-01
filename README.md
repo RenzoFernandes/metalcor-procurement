@@ -76,6 +76,8 @@ Para recriar o banco do zero: `docker compose down -v` e repita os passos 2 e 3.
 - **Erros em ProblemDetail** (RFC 7807), sem stack trace nem detalhes do banco. As mensagens da API são em inglês e o frontend as traduz.
 - **Copiloto seguro:** só uma instrução `SELECT`, só tabelas permitidas, limite de linhas e de tempo, usuário sem permissão de escrita e limite de perguntas por minuto.
 - **Idiomas:** código e tabelas em inglês; interface em PT | EN; dados de exemplo em português.
+- **Identidade visual:** inspirada na linguagem visual do SAP Fiori (cor de destaque, tipografia, padrão de página de objeto) e no ícone do Joule para o copiloto — sem afiliação com a SAP, assim como o restante do projeto.
+- **113 testes automatizados** na API (Testcontainers, banco real em cada execução).
 
 ## Limitações conhecidas
 
@@ -111,7 +113,7 @@ PostgreSQL 17 + Flyway (V1 to V11) · Java 21, Spring Boot, Maven, JdbcClient wi
 
 ## Running locally
 
-Requirements: Docker, Java 21, Node.js, and optionally Ollama or a Gemini API key for the copilot. The included Maven Wrapper handles Maven — no separate install needed.
+Requirements: Docker, Java 21, Node.js, Python 3 (only to regenerate the seed data) and, optionally, Ollama or a Gemini API key for the copilot. The included Maven Wrapper handles Maven — no separate install needed.
 
 1. Optionally copy `.env.example` to `.env` to change ports or development passwords.
 2. `docker compose up -d`, then wait for the `flyway` service to be `Exited (0)` (`docker compose ps -a`).
@@ -127,10 +129,18 @@ Requirements: Docker, Java 21, Node.js, and optionally Ollama or a Gemini API ke
    docker exec -it metalcor-db psql -U metalcor -d metalcor -f /03_receipts.sql
    docker exec -it metalcor-db psql -U metalcor -d metalcor -f /04_invoices_payments.sql
    ```
-4. API (in `api/`): `.\mvnw.cmd spring-boot:run "-Dspring-boot.run.profiles=local"` (Windows) or `./mvnw spring-boot:run "-Dspring-boot.run.profiles=local"` (Linux/macOS). Swagger at http://localhost:8080/swagger-ui.html. See [`api/README.md`](api/README.md) for all environment variables.
+4. API (in `api/`):
+   ```powershell
+   $env:DB_PORT = "5432"   # only if you changed it in .env
+   .\mvnw.cmd spring-boot:run "-Dspring-boot.run.profiles=local"   # Windows
+   ./mvnw spring-boot:run "-Dspring-boot.run.profiles=local"       # Linux/macOS
+   ```
+   Swagger at http://localhost:8080/swagger-ui.html. See [`api/README.md`](api/README.md) for all environment variables.
    > **Windows with a space in the username:** if the Maven Wrapper (`.\mvnw.cmd`) fails with `'C:\Users\name' is not recognized as an internal or external command` and `Cannot start maven from wrapper`, first set `$env:MAVEN_USER_HOME = "D:\.mvnwrapper"` (any path without a space). Details in [`api/README.md`](api/README.md).
-5. Frontend (in `web/`): `npm install` then `npm run dev`, at http://localhost:5173.
+5. Frontend (in `web/`): `npm install` then `npm run dev`, at http://localhost:5173. More in [`web/README.md`](web/README.md).
 6. API tests: `.\mvnw.cmd test` (Windows) or `./mvnw test` (Linux/macOS) in `api/` (requires Docker).
+
+To rebuild the database from scratch: `docker compose down -v`, then repeat steps 2 and 3.
 
 ## Key decisions
 
@@ -140,6 +150,8 @@ Requirements: Docker, Java 21, Node.js, and optionally Ollama or a Gemini API ke
 - Every write runs in one transaction and sets `app.current_user_id` for the audit triggers.
 - Explicit SQL, records as DTOs, `BigDecimal` for money, errors as RFC 7807 `ProblemDetail` with no internals leaked. API messages are in English; the frontend translates them (PT | EN).
 - Copilot guardrails: single `SELECT`, allow-listed tables, row and time limits, a read-only database role and a per-minute rate limit.
+- Visual identity inspired by the SAP Fiori visual language (accent color, typography, object-page pattern) and by Joule's icon for the copilot — not affiliated with SAP, same as the rest of the project.
+- **113 automated API tests** (Testcontainers, a real database on every run).
 
 ## Known limitations
 

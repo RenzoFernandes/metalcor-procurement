@@ -5,12 +5,12 @@
   --color-border: #d9dde3;
   --color-text: #1c232d;
   --color-muted: #5b6675;
-  --color-primary: #1f3a5f;
-  --color-primary-hover: #17304f;
-  --color-accent-soft: #e6ecf4;
+  --color-primary: #0a6ed1;
+  --color-primary-hover: #085fb3;
+  --color-accent-soft: #e8f2fc;
   --color-focus: #2f6fd0;
 
-  --font-sans: 'Segoe UI', system-ui, -apple-system, Roboto, 'Helvetica Neue', Arial, sans-serif;
+  --font-sans: 'Inter', 'Segoe UI', system-ui, -apple-system, Roboto, 'Helvetica Neue', Arial, sans-serif;
   --radius: 6px;
   --space-1: 0.25rem;
   --space-2: 0.5rem;

@@ -76,6 +76,8 @@ public class GeminiClient implements CopilotLlmClient {
         } catch (RestClientResponseException e) {
             // 429 = rate limit; 401/403 = bad key. The status goes to the log, never the key.
             log.warn("Copilot provider gemini answered HTTP {}", e.getStatusCode().value());
+            // The error body explains why (bad field, overloaded model...); DEBUG only, it never holds the key.
+            log.debug("Copilot provider gemini error body: {}", e.getResponseBodyAsString());
             throw new ServiceUnavailableException(CopilotLlmClient.UNAVAILABLE_MESSAGE);
         } catch (RestClientException e) {
             // Timeouts and network errors.

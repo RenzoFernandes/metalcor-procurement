@@ -306,6 +306,7 @@
     "intro": "Faça uma pergunta em linguagem natural sobre pedidos, faturas, fornecedores etc.",
     "rateLimited": "Muitas perguntas em pouco tempo. Aguarde um minuto e tente novamente.",
     "placeholder": "Digite sua pergunta…",
+    "questionLabel": "Pergunta para o copiloto",
     "send": "Enviar",
     "sending": "Gerando resposta…",
     "sql": "SQL gerado",

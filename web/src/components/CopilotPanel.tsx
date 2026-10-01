@@ -1,4 +1,4 @@
-import { useState, type FormEvent } from 'react'
+import { useEffect, useRef, useState, type FormEvent } from 'react'
 import { ApiError, askCopilot } from '../api/client'
 import type { CopilotQueryResponse } from '../api/types'
 import { useTranslation } from '../i18n/I18nContext'
@@ -39,7 +39,7 @@ function CopilotResult({ response, t }: { response: CopilotQueryResponse; t: Ret
             <thead>
               <tr>
                 {response.colunas.map((col) => (
-                  <th key={col}>{col}</th>
+                  <th key={col} scope="col">{col}</th>
                 ))}
               </tr>
             </thead>
@@ -75,6 +75,36 @@ export function CopilotPanel() {
   const [exchanges, setExchanges] = useState<Exchange[]>([])
   const [sending, setSending] = useState(false)
 
+  const panelRef = useRef<HTMLDivElement>(null)
+  const inputRef = useRef<HTMLInputElement>(null)
+  const fabRef = useRef<HTMLButtonElement>(null)
+  const wasOpenRef = useRef(false)
+  const hasUser = user !== null
+
+  // React 18 has no `inert` prop: set it on the DOM node so a closed panel is not tabbable.
+  useEffect(() => {
+    const panel = panelRef.current
+    if (!panel) return
+    panel.inert = !open
+    if (open) {
+      inputRef.current?.focus()
+      wasOpenRef.current = true
+    } else if (wasOpenRef.current) {
+      // The FAB is re-mounted when the panel closes; return focus to it.
+      wasOpenRef.current = false
+      fabRef.current?.focus()
+    }
+  }, [open, hasUser])
+
+  useEffect(() => {
+    if (!open) return
+    function onKeyDown(e: KeyboardEvent) {
+      if (e.key === 'Escape') setOpen(false)
+    }
+    document.addEventListener('keydown', onKeyDown)
+    return () => document.removeEventListener('keydown', onKeyDown)
+  }, [open])
+
   if (!user) return null
 
   function toggleOpen() {
@@ -108,6 +138,7 @@ export function CopilotPanel() {
     <>
       {!open && (
         <button
+          ref={fabRef}
           type="button"
           className="copilot-fab"
           aria-label={t('copilot.fabLabel')}
@@ -125,7 +156,13 @@ export function CopilotPanel() {
         </button>
       )}
 
-      <div className={open ? 'copilot-panel is-open' : 'copilot-panel'} role="dialog" aria-label={t('copilot.title')}>
+      <div
+        ref={panelRef}
+        className={open ? 'copilot-panel is-open' : 'copilot-panel'}
+        role="dialog"
+        aria-modal="true"
+        aria-label={t('copilot.title')}
+      >
         <div className="copilot-panel__header">
           <h2>{t('copilot.title')}</h2>
           <button type="button" className="button button--ghost" onClick={() => setOpen(false)}>
@@ -167,7 +204,9 @@ export function CopilotPanel() {
 
         <form className="copilot-panel__footer" onSubmit={handleSubmit}>
           <input
+            ref={inputRef}
             type="text"
+            aria-label={t('copilot.questionLabel')}
             value={text}
             onChange={(e) => setText(e.target.value)}
             placeholder={t('copilot.placeholder')}

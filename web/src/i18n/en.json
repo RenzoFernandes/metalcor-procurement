@@ -306,6 +306,7 @@
     "intro": "Ask a natural-language question about orders, invoices, suppliers and so on.",
     "rateLimited": "Too many questions in a short time. Wait a minute and try again.",
     "placeholder": "Type your question…",
+    "questionLabel": "Question for the copilot",
     "send": "Send",
     "sending": "Generating answer…",
     "sql": "Generated SQL",

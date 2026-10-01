@@ -25,11 +25,11 @@ export function StaleInvoicesTable({ rows, sql }: { rows: StaleInvoice[]; sql: s
             </colgroup>
             <thead>
               <tr>
-                <th>{t('dashboard.staleInvoices.number')}</th>
-                <th className="num">{t('dashboard.staleInvoices.amount')}</th>
-                <th className="num">{t('dashboard.staleInvoices.age')}</th>
-                <th>{t('dashboard.staleInvoices.ageBand')}</th>
-                <th>{t('dashboard.staleInvoices.reason')}</th>
+                <th scope="col">{t('dashboard.staleInvoices.number')}</th>
+                <th scope="col" className="num">{t('dashboard.staleInvoices.amount')}</th>
+                <th scope="col" className="num">{t('dashboard.staleInvoices.age')}</th>
+                <th scope="col">{t('dashboard.staleInvoices.ageBand')}</th>
+                <th scope="col">{t('dashboard.staleInvoices.reason')}</th>
               </tr>
             </thead>
             <tbody>

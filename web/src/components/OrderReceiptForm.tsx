@@ -72,10 +72,10 @@ export function OrderReceiptForm({ order, user, onReceived }: Props) {
         <table className="table">
           <thead>
             <tr>
-              <th>{t('fields.materialId')}</th>
-              <th className="num">{t('receipt.form.ordered')}</th>
-              <th className="num">{t('receipt.form.remaining')}</th>
-              <th className="num">{t('receipt.form.toReceive')}</th>
+              <th scope="col">{t('fields.materialId')}</th>
+              <th scope="col" className="num">{t('receipt.form.ordered')}</th>
+              <th scope="col" className="num">{t('receipt.form.remaining')}</th>
+              <th scope="col" className="num">{t('receipt.form.toReceive')}</th>
             </tr>
           </thead>
           <tbody>

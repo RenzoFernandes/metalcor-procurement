@@ -119,10 +119,10 @@ export function OrderInvoiceForm({ order, user }: Props) {
         <table className="table">
           <thead>
             <tr>
-              <th>{t('fields.materialId')}</th>
-              <th className="num">{t('receipt.form.ordered')}</th>
-              <th className="num">{t('invoice.form.quantityInvoiced')}</th>
-              <th className="num">{t('invoice.form.unitPriceInvoiced')}</th>
+              <th scope="col">{t('fields.materialId')}</th>
+              <th scope="col" className="num">{t('receipt.form.ordered')}</th>
+              <th scope="col" className="num">{t('invoice.form.quantityInvoiced')}</th>
+              <th scope="col" className="num">{t('invoice.form.unitPriceInvoiced')}</th>
             </tr>
           </thead>
           <tbody>

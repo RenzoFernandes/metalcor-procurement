@@ -94,10 +94,10 @@ function OrderView({ order, user, onChange }: ViewProps) {
           <table className="table">
             <thead>
               <tr>
-                <th>{t('fields.materialId')}</th>
-                <th className="num">{t('fields.quantity')}</th>
-                <th className="num">{t('order.unitPrice')}</th>
-                <th className="num">{t('requisition.detail.lineTotal')}</th>
+                <th scope="col">{t('fields.materialId')}</th>
+                <th scope="col" className="num">{t('fields.quantity')}</th>
+                <th scope="col" className="num">{t('order.unitPrice')}</th>
+                <th scope="col" className="num">{t('requisition.detail.lineTotal')}</th>
               </tr>
             </thead>
             <tbody>

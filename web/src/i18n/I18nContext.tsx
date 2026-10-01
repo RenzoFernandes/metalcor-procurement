@@ -1,4 +1,4 @@
-import { createContext, useCallback, useContext, useMemo, useState, type ReactNode } from 'react'
+import { createContext, useCallback, useContext, useEffect, useMemo, useState, type ReactNode } from 'react'
 import pt from './pt.json'
 import en from './en.json'
 
@@ -30,6 +30,10 @@ function lookup(dictionary: unknown, key: string): string | undefined {
 /** Language is kept in memory only (resets on reload). Default is Portuguese. */
 export function I18nProvider({ children }: { children: ReactNode }) {
   const [lang, setLang] = useState<Language>('pt')
+
+  useEffect(() => {
+    document.documentElement.lang = lang
+  }, [lang])
 
   const t = useCallback(
     (key: string, params?: Params) => {

@@ -163,12 +163,12 @@ function RequisitionView({ requisition, user, justCreated, onChange }: ViewProps
           <table className="table">
             <thead>
               <tr>
-                <th>#</th>
-                <th>{t('fields.materialId')}</th>
-                <th className="num">{t('fields.quantity')}</th>
-                <th>{t('fields.unitOfMeasureId')}</th>
-                <th className="num">{t('fields.estimatedUnitPrice')}</th>
-                <th className="num">{t('requisition.detail.lineTotal')}</th>
+                <th scope="col">#</th>
+                <th scope="col">{t('fields.materialId')}</th>
+                <th scope="col" className="num">{t('fields.quantity')}</th>
+                <th scope="col">{t('fields.unitOfMeasureId')}</th>
+                <th scope="col" className="num">{t('fields.estimatedUnitPrice')}</th>
+                <th scope="col" className="num">{t('requisition.detail.lineTotal')}</th>
               </tr>
             </thead>
             <tbody>

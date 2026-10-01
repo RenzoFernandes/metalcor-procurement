@@ -27,7 +27,7 @@ Telas por perfil (solicitante, aprovador, comprador, financeiro e gestor, escolh
 
 ## Como rodar localmente
 
-Requisitos: Docker, Java 21, Maven, Node.js, Python 3 (só para regenerar os dados) e, opcionalmente, Ollama ou uma chave do Gemini para o copiloto.
+Requisitos: Docker, Java 21, Node.js, Python 3 (só para regenerar os dados) e, opcionalmente, Ollama ou uma chave do Gemini para o copiloto. O Maven Wrapper (incluído no repositório) cuida do Maven — não precisa instalar.
 
 1. **Variáveis (opcional):** copie `.env.example` para `.env` para mudar portas ou senhas de desenvolvimento (por exemplo `DB_PORT`, se a 5432 estiver ocupada).
 2. **Banco:**
@@ -35,11 +35,23 @@ Requisitos: Docker, Java 21, Maven, Node.js, Python 3 (só para regenerar os dad
    docker compose up -d
    docker compose ps -a   # espere o serviço flyway ficar Exited (0)
    ```
-3. **Dados fictícios:** carregue `db/seed/01_master_data.sql`, `02_purchasing.sql`, `03_receipts.sql` e `04_invoices_payments.sql`, nessa ordem, com `docker cp` e `psql` dentro do contêiner `metalcor-db`.
+3. **Dados fictícios:** carregue os quatro arquivos de `db/seed`, nessa ordem (o usuário do banco é `metalcor`, definido por `DB_USER` no `docker-compose.yml`; não existe o usuário `postgres`):
+   ```powershell
+   docker cp db/seed/01_master_data.sql metalcor-db:/01_master_data.sql
+   docker cp db/seed/02_purchasing.sql metalcor-db:/02_purchasing.sql
+   docker cp db/seed/03_receipts.sql metalcor-db:/03_receipts.sql
+   docker cp db/seed/04_invoices_payments.sql metalcor-db:/04_invoices_payments.sql
+
+   docker exec -it metalcor-db psql -U metalcor -d metalcor -f /01_master_data.sql
+   docker exec -it metalcor-db psql -U metalcor -d metalcor -f /02_purchasing.sql
+   docker exec -it metalcor-db psql -U metalcor -d metalcor -f /03_receipts.sql
+   docker exec -it metalcor-db psql -U metalcor -d metalcor -f /04_invoices_payments.sql
+   ```
 4. **API** (pasta `api/`):
    ```powershell
    $env:DB_PORT = "5432"
-   mvn spring-boot:run "-Dspring-boot.run.profiles=local"
+   .\mvnw.cmd spring-boot:run "-Dspring-boot.run.profiles=local"   # Windows
+   ./mvnw spring-boot:run "-Dspring-boot.run.profiles=local"       # Linux/macOS
    ```
    Swagger em http://localhost:8080/swagger-ui.html. Variáveis e detalhes em [`api/README.md`](api/README.md).
 
@@ -50,7 +62,7 @@ Requisitos: Docker, Java 21, Maven, Node.js, Python 3 (só para regenerar os dad
    npm run dev
    ```
    Abre em http://localhost:5173. Mais em [`web/README.md`](web/README.md).
-6. **Testes da API:** `mvn test` na pasta `api/` (precisam do Docker).
+6. **Testes da API:** `.\mvnw.cmd test` (Windows) ou `./mvnw test` (Linux/macOS) na pasta `api/` (precisam do Docker).
 
 Para recriar o banco do zero: `docker compose down -v` e repita os passos 2 e 3.
 
@@ -99,15 +111,26 @@ PostgreSQL 17 + Flyway (V1 to V11) · Java 21, Spring Boot, Maven, JdbcClient wi
 
 ## Running locally
 
-Requirements: Docker, Java 21, Maven, Node.js, and optionally Ollama or a Gemini API key for the copilot.
+Requirements: Docker, Java 21, Node.js, and optionally Ollama or a Gemini API key for the copilot. The included Maven Wrapper handles Maven — no separate install needed.
 
 1. Optionally copy `.env.example` to `.env` to change ports or development passwords.
 2. `docker compose up -d`, then wait for the `flyway` service to be `Exited (0)` (`docker compose ps -a`).
-3. Load `db/seed/01_master_data.sql` to `04_invoices_payments.sql`, in order, with `docker cp` and `psql` inside the `metalcor-db` container.
-4. API (in `api/`): `mvn spring-boot:run "-Dspring-boot.run.profiles=local"`. Swagger at http://localhost:8080/swagger-ui.html. See [`api/README.md`](api/README.md) for all environment variables.
+3. Load the four files in `db/seed`, in order (the database user is `metalcor`, set by `DB_USER` in `docker-compose.yml`; there is no `postgres` user):
+   ```powershell
+   docker cp db/seed/01_master_data.sql metalcor-db:/01_master_data.sql
+   docker cp db/seed/02_purchasing.sql metalcor-db:/02_purchasing.sql
+   docker cp db/seed/03_receipts.sql metalcor-db:/03_receipts.sql
+   docker cp db/seed/04_invoices_payments.sql metalcor-db:/04_invoices_payments.sql
+
+   docker exec -it metalcor-db psql -U metalcor -d metalcor -f /01_master_data.sql
+   docker exec -it metalcor-db psql -U metalcor -d metalcor -f /02_purchasing.sql
+   docker exec -it metalcor-db psql -U metalcor -d metalcor -f /03_receipts.sql
+   docker exec -it metalcor-db psql -U metalcor -d metalcor -f /04_invoices_payments.sql
+   ```
+4. API (in `api/`): `.\mvnw.cmd spring-boot:run "-Dspring-boot.run.profiles=local"` (Windows) or `./mvnw spring-boot:run "-Dspring-boot.run.profiles=local"` (Linux/macOS). Swagger at http://localhost:8080/swagger-ui.html. See [`api/README.md`](api/README.md) for all environment variables.
    > **Windows with a space in the username:** if the Maven Wrapper (`.\mvnw.cmd`) fails with `'C:\Users\name' is not recognized as an internal or external command` and `Cannot start maven from wrapper`, first set `$env:MAVEN_USER_HOME = "D:\.mvnwrapper"` (any path without a space). Details in [`api/README.md`](api/README.md).
 5. Frontend (in `web/`): `npm install` then `npm run dev`, at http://localhost:5173.
-6. API tests: `mvn test` in `api/` (requires Docker).
+6. API tests: `.\mvnw.cmd test` (Windows) or `./mvnw test` (Linux/macOS) in `api/` (requires Docker).
 
 ## Key decisions
 

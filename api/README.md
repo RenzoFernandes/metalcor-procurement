@@ -25,11 +25,12 @@ Isso sobe o PostgreSQL 17, aplica as migrações `db/init` (V1 a V11) com o Flyw
 
 ## Rodar a API (perfil local)
 
-Na pasta `api/`, com a porta do banco em `DB_PORT` (5434 na minha máquina, 5432 por padrão):
+Na pasta `api/`, com a porta do banco em `DB_PORT` (ajuste para o valor do seu .env, 5432 por padrão):
 
 ```powershell
 $env:DB_PORT = "5434"
-mvn spring-boot:run "-Dspring-boot.run.profiles=local"
+.\mvnw.cmd spring-boot:run "-Dspring-boot.run.profiles=local"   # Windows
+./mvnw spring-boot:run "-Dspring-boot.run.profiles=local"       # Linux/macOS
 ```
 
 O perfil `local` só define senhas de desenvolvimento e a origem do CORS; sem ele, `APP_DB_PASSWORD` e `READONLY_DB_PASSWORD` são obrigatórias. O perfil `prod` não tem padrões e desliga o Swagger.
@@ -83,7 +84,8 @@ Há ainda `COPILOT_RATE_LIMIT_PER_MINUTE` (perguntas por usuário por minuto, pa
 ## Testes
 
 ```powershell
-mvn test
+.\mvnw.cmd test   # Windows
+./mvnw test       # Linux/macOS
 ```
 
 Precisam do Docker: sobem um PostgreSQL 17 descartável (Testcontainers), aplicam `db/init`, carregam `db/seed` e conectam como `metalcor_app`.

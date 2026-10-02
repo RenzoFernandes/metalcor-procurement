@@ -2,6 +2,8 @@
 
 Mini-ERP de compras (procure-to-pay) com Java, PostgreSQL e React. Projeto de estudo para portfólio. [English version below](#english).
 
+**🔗 No ar:** [metalcor-procurement.vercel.app](https://metalcor-procurement.vercel.app) — sem cadastro, é só escolher um usuário fictício em "Entrar como". A API roda no plano gratuito do Render e "dorme" após um tempo sem uso: a primeira requisição depois de um tempo parado pode levar ~50 segundos para responder.
+
 > **Aviso:** a Metalcor Autopeças, todos os fornecedores, materiais, usuários e valores são **100% fictícios**, criados para fins de portfólio. Os preços são estimativas e qualquer semelhança com empresas reais é coincidência. Este projeto **não é SAP** e não deve ser apresentado como tal: ele é inspirado em como ERPs organizam o processo de compras.
 
 ## Visão geral
@@ -15,6 +17,16 @@ O ponto central é o **three-way match**: cada fatura é cruzada com o pedido e 
 Os 12 meses de dados fictícios têm 10 tipos de anomalias plantadas de propósito (entrega atrasada, fatura duplicada, divergência de preço etc.), para que o painel e o copiloto tenham o que encontrar.
 
 Telas por perfil (solicitante, aprovador, comprador, financeiro e gestor, escolhidos em "Entrar como"), painel do gestor com gráficos, exportação para Excel, modo técnico (mostra o SQL por trás de cada gráfico) e um copiloto que responde perguntas em linguagem natural com consultas SQL somente leitura.
+
+## Screenshots
+
+| Login | Painel do gestor |
+|---|---|
+| ![Tela de login](docs/screenshots/login.jpg) | ![KPIs do painel](docs/screenshots/dashboard-kpis.jpg) |
+
+| Gráfico com detalhe | Copiloto respondendo em linguagem natural |
+|---|---|
+| ![Gráfico de atrasos](docs/screenshots/dashboard-chart.jpg) | ![Copiloto respondendo uma pergunta](docs/screenshots/copilot.jpg) |
 
 ## Stack
 
@@ -85,7 +97,7 @@ Para recriar o banco do zero: `docker compose down -v` e repita os passos 2 e 3.
 - Não é SAP e não cobre NF-e, campos fiscais, estoque nem multi-empresa.
 - O copiloto depende de um modelo de linguagem e pode errar; as respostas devem ser conferidas contra o banco.
 - A busca de documentos no frontend é por id (não há busca por número do documento).
-- Sem testes automáticos de frontend. O deploy ainda não foi feito.
+- Sem testes automáticos de frontend.
 
 ---
 
@@ -94,6 +106,8 @@ Para recriar o banco do zero: `docker compose down -v` e repita os passos 2 e 3.
 # English
 
 A procure-to-pay mini-ERP built with Java, PostgreSQL and React. It is a study / portfolio project.
+
+**🔗 Live:** [metalcor-procurement.vercel.app](https://metalcor-procurement.vercel.app) — no sign-up, just pick a fictional user under "Sign in as". The API runs on Render's free tier and spins down after inactivity: the first request after idle time can take ~50 seconds to respond.
 
 > **Disclaimer:** Metalcor Autopeças, every supplier, material, user and amount are **100% fictional**, created for portfolio purposes. Prices are estimates and any resemblance to real companies is coincidental. This project is **not SAP** and must not be presented as such: it is inspired by how ERPs organize the purchasing process.
 
@@ -106,6 +120,16 @@ It simulates the purchasing cycle of a fictional auto-parts metalworking company
 The core is the **three-way match**: each invoice is checked against its purchase order and goods receipt using configurable tolerances (default 2% price, 5% quantity). Out-of-tolerance invoices are blocked until resolved. It draws on concepts from ERP purchasing and finance modules: header/item documents, number ranges, approvals and an audit trail.
 
 Twelve months of fictional data include 10 deliberately planted anomaly types (late delivery, duplicate invoice, price mismatch, etc.). The app has role-based screens (requester, approver, buyer, finance, manager, chosen via "Sign in as"), a manager dashboard, Excel export, a technical mode that shows the SQL behind every chart, and a copilot that answers natural-language questions with read-only SQL.
+
+## Screenshots
+
+| Login | Manager dashboard |
+|---|---|
+| ![Login screen](docs/screenshots/login.jpg) | ![Dashboard KPIs](docs/screenshots/dashboard-kpis.jpg) |
+
+| Chart with tooltip detail | Copilot answering in natural language |
+|---|---|
+| ![Late-delivery chart](docs/screenshots/dashboard-chart.jpg) | ![Copilot answering a question](docs/screenshots/copilot.jpg) |
 
 ## Stack
 
@@ -158,4 +182,4 @@ To rebuild the database from scratch: `docker compose down -v`, then repeat step
 - **Provisional authentication:** the API identifies the user through an `X-User-Id` header, with no password, token or session, and the front end uses a static user list. It demonstrates roles and auditing; it is **not production security**.
 - Not SAP; no e-invoicing, tax fields, inventory or multi-company support.
 - The copilot relies on a language model and can be wrong; check answers against the database.
-- Document lookup in the UI is by id only. There are no front-end automated tests, and nothing is deployed yet.
+- Document lookup in the UI is by id only. There are no front-end automated tests.

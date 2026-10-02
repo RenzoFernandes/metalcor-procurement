@@ -24,9 +24,13 @@ Telas por perfil (solicitante, aprovador, comprador, financeiro e gestor, escolh
 |---|---|
 | ![Tela de login](docs/screenshots/login.jpg) | ![KPIs do painel](docs/screenshots/dashboard-kpis.jpg) |
 
-| Gráfico com detalhe | Copiloto respondendo em linguagem natural |
+| Faturas bloqueadas pelo three-way match | Pedido de compra com fornecedor automático |
 |---|---|
-| ![Gráfico de atrasos](docs/screenshots/dashboard-chart.jpg) | ![Copiloto respondendo uma pergunta](docs/screenshots/copilot.jpg) |
+| ![Faturas paradas por exceção](docs/screenshots/invoice-exceptions.jpg) | ![Pedido de compra emitido](docs/screenshots/purchase-order.jpg) |
+
+| Copiloto respondendo em linguagem natural |
+|---|
+| ![Copiloto respondendo uma pergunta](docs/screenshots/copilot.jpg) |
 
 ## Stack
 
@@ -127,9 +131,13 @@ Twelve months of fictional data include 10 deliberately planted anomaly types (l
 |---|---|
 | ![Login screen](docs/screenshots/en/login.jpg) | ![Dashboard KPIs](docs/screenshots/en/dashboard-kpis.jpg) |
 
-| Chart with tooltip detail | Copilot answering in natural language |
+| Invoices blocked by the three-way match | Purchase order with automatic supplier pick |
 |---|---|
-| ![Late-delivery chart](docs/screenshots/en/dashboard-chart.jpg) | ![Copilot answering a question](docs/screenshots/en/copilot.jpg) |
+| ![Stale invoices by exception](docs/screenshots/en/invoice-exceptions.jpg) | ![Issued purchase order](docs/screenshots/en/purchase-order.jpg) |
+
+| Copilot answering in natural language |
+|---|
+| ![Copilot answering a question](docs/screenshots/en/copilot.jpg) |
 
 ## Stack
 

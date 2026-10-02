@@ -125,11 +125,11 @@ Twelve months of fictional data include 10 deliberately planted anomaly types (l
 
 | Login | Manager dashboard |
 |---|---|
-| ![Login screen](docs/screenshots/login.jpg) | ![Dashboard KPIs](docs/screenshots/dashboard-kpis.jpg) |
+| ![Login screen](docs/screenshots/en/login.jpg) | ![Dashboard KPIs](docs/screenshots/en/dashboard-kpis.jpg) |
 
 | Chart with tooltip detail | Copilot answering in natural language |
 |---|---|
-| ![Late-delivery chart](docs/screenshots/dashboard-chart.jpg) | ![Copilot answering a question](docs/screenshots/copilot.jpg) |
+| ![Late-delivery chart](docs/screenshots/en/dashboard-chart.jpg) | ![Copilot answering a question](docs/screenshots/en/copilot.jpg) |
 
 ## Stack
 
